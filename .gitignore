@@ -9,5 +9,11 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# IDE
+.idea/
+
+# Database
+*.db
+
 # Local reports
 markdown_check_report.json

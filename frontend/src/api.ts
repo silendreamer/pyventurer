@@ -5,6 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8001/api";
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
@@ -56,4 +57,13 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ anonymous_user_id: anonymousUserId, name, email }),
     }),
+  register: (email: string, name: string, password: string, anonymousUserId?: string) =>
+    request("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ email, name, password, anonymous_user_id: anonymousUserId }),
+    }),
+  login: (email: string, password: string) =>
+    request("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
+  logout: () => request("/auth/logout", { method: "POST" }),
+  me: () => request("/auth/me"),
 };

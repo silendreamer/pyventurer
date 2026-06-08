@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
-from app.api.routes import courses, exercises, onboarding, placement, progress, quizzes, themes
+from app.api.routes import auth, courses, exercises, onboarding, placement, progress, quizzes, themes
 
 api_router = APIRouter()
+api_router.include_router(auth.router, tags=["auth"])
 api_router.include_router(onboarding.router, tags=["onboarding"])
 api_router.include_router(courses.router, tags=["courses"])
 api_router.include_router(placement.router, tags=["placement"])

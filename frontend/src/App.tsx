@@ -85,6 +85,7 @@ function App() {
   const [quizResult, setQuizResult] = useState<string>("");
   const [accountMessage, setAccountMessage] = useState("");
   const [apiMessage, setApiMessage] = useState("");
+  const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null);
 
   useEffect(() => {
     Promise.all([api.themes(), api.progress(anonymousUserId)])
@@ -99,6 +100,9 @@ function App() {
         setThemes([defaultTheme]);
         setApiMessage("Backend connection is unavailable. Showing the local starter experience.");
       });
+    api.me()
+      .then((data) => setUser((data as { user: { id: string; email: string; name: string } }).user))
+      .catch(() => {});
   }, []);
 
   const cssVars = useMemo(
@@ -196,11 +200,35 @@ function App() {
     setProgress(result.progress);
   }
 
-  async function createAccount() {
-    const result = (await api.createAccount(anonymousUserId, "Demo Learner", "learner@example.com")) as {
-      message: string;
-    };
-    setAccountMessage(result.message);
+  async function handleRegister(name: string, email: string, password: string) {
+    try {
+      const result = (await api.register(email, name, password, anonymousUserId)) as {
+        user: { id: string; email: string; name: string };
+        message: string;
+      };
+      setUser(result.user);
+      setAccountMessage(result.message);
+    } catch {
+      setAccountMessage("Registration failed. Email may already be in use.");
+    }
+  }
+
+  async function handleLogin(email: string, password: string) {
+    try {
+      const result = (await api.login(email, password)) as {
+        user: { id: string; email: string; name: string };
+      };
+      setUser(result.user);
+      setAccountMessage("Welcome back!");
+    } catch {
+      setAccountMessage("Invalid email or password.");
+    }
+  }
+
+  async function handleLogout() {
+    await api.logout();
+    setUser(null);
+    setAccountMessage("");
   }
 
   return (
@@ -230,6 +258,11 @@ function App() {
               {item}
             </button>
           ))}
+          {user && (
+            <span className="step active" style={{ cursor: "default" }}>
+              {user.name}
+            </span>
+          )}
         </nav>
       </header>
 
@@ -302,7 +335,14 @@ function App() {
             />
           )}
           {step === "save" && (
-            <AccountPrompt progress={progress} message={accountMessage} onCreate={createAccount} />
+            <AuthPanel
+              progress={progress}
+              message={accountMessage}
+              user={user}
+              onRegister={handleRegister}
+              onLogin={handleLogin}
+              onLogout={handleLogout}
+            />
           )}
         </section>
       </section>
@@ -640,30 +680,84 @@ function QuizPanel({
   );
 }
 
-function AccountPrompt({
+function AuthPanel({
   progress,
   message,
-  onCreate,
+  user,
+  onRegister,
+  onLogin,
+  onLogout,
 }: {
   progress: Progress;
   message: string;
-  onCreate: () => void;
+  user: { id: string; email: string; name: string } | null;
+  onRegister: (name: string, email: string, password: string) => void;
+  onLogin: (email: string, password: string) => void;
+  onLogout: () => void;
 }) {
+  const [mode, setMode] = useState<"register" | "login">("register");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  if (user) {
+    return (
+      <div className="flow-panel save-panel">
+        <PanelHeader icon={<Save size={22} />} title="Progress saved" />
+        <p>Logged in as <strong>{user.name}</strong> ({user.email}). Your progress is saved.</p>
+        <div className="stats wide">
+          <div>
+            <strong>{progress.xp}</strong>
+            <span>XP saved</span>
+          </div>
+          <div>
+            <strong>{progress.badges.length}</strong>
+            <span>badges</span>
+          </div>
+        </div>
+        <button className="secondary-button" onClick={onLogout}>Log out</button>
+      </div>
+    );
+  }
+
   return (
     <div className="flow-panel save-panel">
-      <PanelHeader icon={<Save size={22} />} title="Create an account to save progress" />
-      <p>You have tried the lesson, run code, earned XP, and unlocked badges before registration.</p>
-      <div className="stats wide">
-        <div>
-          <strong>{progress.xp}</strong>
-          <span>XP ready to save</span>
-        </div>
-        <div>
-          <strong>{progress.badges.length}</strong>
-          <span>badges</span>
-        </div>
+      <PanelHeader icon={<Save size={22} />} title={mode === "register" ? "Create an account" : "Log in"} />
+      <p>You have earned {progress.xp} XP and {progress.badges.length} badges. Save your progress by creating an account.</p>
+      <div className="auth-form">
+        {mode === "register" && (
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        )}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password (6+ characters)"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          className="primary-button"
+          onClick={() => mode === "register" ? onRegister(name, email, password) : onLogin(email, password)}
+        >
+          {mode === "register" ? "Create account" : "Log in"}
+        </button>
       </div>
-      <button className="primary-button" onClick={onCreate}>Create demo account</button>
+      <button
+        className="secondary-button"
+        onClick={() => setMode(mode === "register" ? "login" : "register")}
+      >
+        {mode === "register" ? "Already have an account? Log in" : "Need an account? Register"}
+      </button>
       {message && <div className="result success">{message}</div>}
     </div>
   );

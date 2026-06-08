@@ -32,3 +32,15 @@ class AccountRequest(BaseModel):
     anonymous_user_id: str = "demo-user"
     email: str
     name: str
+
+
+class RegisterRequest(BaseModel):
+    email: str
+    name: str
+    password: str
+    anonymous_user_id: str | None = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
