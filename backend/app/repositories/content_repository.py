@@ -1,3 +1,7 @@
+from typing import NoReturn
+
+from fastapi import HTTPException
+
 from app.models.domain import (
     Course,
     Exercise,
@@ -8,6 +12,10 @@ from app.models.domain import (
     Quiz,
     QuizQuestionWithAnswer,
 )
+
+
+def _not_found(entity: str, identifier: str) -> NoReturn:
+    raise HTTPException(status_code=404, detail=f"{entity} '{identifier}' not found")
 
 
 class ContentRepository:
@@ -152,22 +160,22 @@ class ContentRepository:
         return self.courses
 
     def get_course(self, course_id: str) -> Course:
-        return next(course for course in self.courses if course.id == course_id)
+        return next((course for course in self.courses if course.id == course_id), None) or _not_found("Course", course_id)
 
     def get_course_by_slug(self, slug: str) -> Course:
-        return next(course for course in self.courses if course.slug == slug)
+        return next((course for course in self.courses if course.slug == slug), None) or _not_found("Course", slug)
 
     def get_lesson(self, lesson_id: str) -> Lesson:
-        return next(lesson for lesson in self.lessons if lesson.id == lesson_id)
+        return next((lesson for lesson in self.lessons if lesson.id == lesson_id), None) or _not_found("Lesson", lesson_id)
 
     def get_exercise(self, exercise_id: str) -> Exercise:
-        return next(exercise for exercise in self.exercises if exercise.id == exercise_id)
+        return next((exercise for exercise in self.exercises if exercise.id == exercise_id), None) or _not_found("Exercise", exercise_id)
 
     def get_quiz(self, quiz_id: str) -> Quiz:
-        return next(quiz for quiz in self.quizzes if quiz.id == quiz_id)
+        return next((quiz for quiz in self.quizzes if quiz.id == quiz_id), None) or _not_found("Quiz", quiz_id)
 
     def get_placement_for_course(self, course_id: str) -> PlacementAssessment:
-        return next(assessment for assessment in self.placement_assessments if assessment.course_id == course_id)
+        return next((a for a in self.placement_assessments if a.course_id == course_id), None) or _not_found("Placement", course_id)
 
 
 content_repository = ContentRepository()

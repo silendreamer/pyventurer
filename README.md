@@ -46,7 +46,6 @@ to building real things:
 - automation tools
 - data projects
 - AI agents
-- AI agents
 
 The goal is real-world skill development.
 

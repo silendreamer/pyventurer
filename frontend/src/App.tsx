@@ -4,7 +4,6 @@ import {
   CheckCircle2,
   ChevronRight,
   Code2,
-  Compass,
   Flame,
   GraduationCap,
   Lightbulb,
@@ -341,32 +340,6 @@ function ThemeSelector({
         ))}
       </div>
       {!compact && <p>{selectedTheme.description}</p>}
-    </div>
-  );
-}
-
-function PathPanel({ recommendations, compact = false }: { recommendations: Recommendation[]; compact?: boolean }) {
-  const recommendation = recommendations[0];
-  return (
-    <div className={compact ? "panel compact-panel" : "panel"}>
-      <div className="panel-title">
-        <Compass size={18} />
-        Path
-      </div>
-      {recommendation ? (
-        <>
-          <h3>{recommendation.course.title}</h3>
-          <p>{recommendation.course.difficulty} - {recommendation.course.estimated_duration}</p>
-          <div className="chips">
-            <span>Python</span>
-            <span>JavaScript later</span>
-            <span>SQL later</span>
-            <span>AI Agents later</span>
-          </div>
-        </>
-      ) : (
-        <p className="muted">Answer goals to unlock a recommendation.</p>
-      )}
     </div>
   );
 }
@@ -723,31 +696,6 @@ function QuestionBlock({
         ))}
       </div>
     </fieldset>
-  );
-}
-
-function Select({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: string[][];
-}) {
-  return (
-    <label className="select-field">
-      <span>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map(([optionValue, labelText]) => (
-          <option value={optionValue} key={optionValue}>
-            {labelText}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
 

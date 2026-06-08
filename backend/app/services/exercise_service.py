@@ -38,14 +38,20 @@ class ExerciseService:
         }
 
     def _run_python_safely(self, code: str) -> tuple[str, str | None]:
-        forbidden = ["import", "open(", "exec(", "eval(", "__", "input(", "subprocess", "os.", "sys."]
+        forbidden = [
+            "import", "open(", "exec(", "eval(", "__", "input(",
+            "subprocess", "os.", "sys.", "breakpoint", "compile(",
+            "getattr", "setattr", "delattr", "globals", "locals",
+            "vars(", "dir(", "type(", "classmethod", "staticmethod",
+        ]
         if any(token in code for token in forbidden):
             return "", "This demo runner blocks imports, file access, input, and dynamic execution."
-        safe_builtins = {"print": print}
+        safe_builtins = {"print": print, "range": range, "len": len, "str": str, "int": int, "float": float}
         buffer = io.StringIO()
         try:
+            compiled = compile(code, "<exercise>", "exec")
             with redirect_stdout(buffer):
-                exec(code, {"__builtins__": safe_builtins}, {})
+                exec(compiled, {"__builtins__": safe_builtins}, {})
         except Exception as exc:
             return buffer.getvalue(), f"Python error: {exc}"
         return buffer.getvalue(), None
