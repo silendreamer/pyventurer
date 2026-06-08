@@ -11,508 +11,415 @@ and other technical subjects.
 The platform should not be hardcoded around a single course, a single
 programming language, or a game engine.
 
-## Product Direction
+## Current MVP Status
 
-PyVenturer should feel like a structured learning platform with light
-gamification.
+The MVP skeleton is implemented with a React frontend and FastAPI backend.
 
-The platform should teach real skills through:
+Implemented now:
 
-- lessons
-- exercises
-- quizzes
-- projects
-- placement tests
-- recommendations
+- staged learner onboarding
+- Python value intro on landing
+- course recommendation flow
+- placement assessment
+- one sample lesson
+- one interactive coding exercise
+- one quiz
 - progress tracking
-- badges
-- future AI tutoring
+- XP, streak, and badges
+- user-selectable themes
+- backend auth endpoints for register, login, logout, and current user
+- frontend placeholder account prompt after value is shown
+- backend-owned recommendation, placement, quiz, exercise, progress, and badge
+  logic
+- SQLite-backed profile, progress, and user repositories
+- in-memory seed content and theme repositories
+- backend tests for important business rules
 
-The product should not be centered around fake game commands like `move_right()`
-or `collect_gem()`.
+Not implemented yet:
 
-Games may exist later as real projects that students build using actual
-programming concepts.
-
----
+- migrations
+- frontend register/login screens
+- full Python curriculum
+- projects workflow
+- real CMS/admin tooling
+- AI tutor
+- Monaco editor
+- production runner isolation
+- deployment
 
 ## High-Level User Journey
 
 ```text
 Anonymous Visitor
-    ↓
-Landing Page
-    ↓
-Quick Goal / Profile Questions
-    ↓
-Recommended Courses
-    ↓
-Placement Assessment
-    ↓
-Recommended Starting Point
-    ↓
-Try Sample Lesson / Exercise
-  ↓
-Create Account To Save Progress
-  ↓
-Continue Learning
-
+  -> Landing Page with Python value message
+  -> Staged Profile Questions
+     -> age range
+     -> skill level
+     -> learning goal
+     -> preferred learning style
+     -> selected theme
+  -> Recommended Course
+  -> Placement Assessment
+  -> Recommended Starting Point
+  -> Try Sample Lesson / Exercise
+  -> Try Quiz
+  -> Create Account To Save Progress
 ```
 
-The key principle is:
+The key principle is: show value before registration.
 
-Show value before registration.
-
-High-Level System Diagram
+## Current System Shape
 
 ```text
-┌───────────────────────────────────────┐
-│               Frontend                │
-│ React + TypeScript + Tailwind          │
-└───────────────────┬───────────────────┘
-          │
-          ▼
-┌───────────────────────────────────────┐
-│                API Layer              │
-│ FastAPI Routes                         │
-└───────────────────┬───────────────────┘
-          │
-          ▼
-┌───────────────────────────────────────┐
-│              Service Layer            │
-├───────────────────────────────────────┤
-│ Content Service                        │
-│ Recommendation Service                 │
-│ Placement Service                      │
-│ Exercise Service                       │
-│ Quiz Service                           │
-│ Project Service                        │
-│ Progress Service                       │
-│ Badge Service                          │
-│ Auth / Account Service                 │
-│ Tutor Service                          │
-└───────────────────┬───────────────────┘
-          │
-          ▼
-┌───────────────────────────────────────┐
-│            Repository Layer           │
-├───────────────────────────────────────┤
-│ Course Repository                      │
-│ Content Repository                     │
-│ User Repository                        │
-│ Progress Repository                    │
-│ Assessment Repository                  │
-│ Badge Repository                       │
-└───────────────────┬───────────────────┘
-          │
-          ▼
-┌───────────────────────────────────────┐
-│              Data Storage             │
-├───────────────────────────────────────┤
-│ SQLite for MVP                         │
-│ PostgreSQL later                       │
-│ CMS later                              │
-└───────────────────────────────────────┘
+Frontend
+  React + TypeScript + Vite + custom CSS
+  Renders API-provided content and theme tokens
+
+API Layer
+  FastAPI routes
+  Thin wrappers around services
+
+Service Layer
+  Content Service
+  Recommendation Service
+  Placement Service
+  Exercise Service
+  Quiz Service
+  Progress Service
+  Badge Service
+  Theme Service
+  Account Service placeholder
+
+Repository Layer
+  In-memory content repository
+  SQLite-backed progress/profile repository
+  SQLite-backed user repository
+  In-memory theme repository
+
+Current Data Storage
+  SQLite for MVP persistence
+
+Future Data Storage
+  PostgreSQL or another production persistent database
+  CMS/admin content management
 ```
 
-Core Architecture Principle
+## Core Architecture Principle
 
 The platform should be content-driven.
 
 This means:
 
-courses come from data lessons come from data quizzes come from data exercises
-come from data projects come from data recommendations are rule-driven or data-
-driven frontend components render data, not hardcoded curriculum Main Domain
-Model Language
+- courses come from data
+- lessons come from data
+- quizzes come from data
+- exercises come from data
+- projects come from data
+- recommendations are rule-driven or data-driven
+- frontend components render data, not hardcoded curriculum
+
+The current MVP uses tiny in-memory seed content to prove the full flow.
+Profile, progress, badges, and users are persisted in SQLite. Future development
+should move learning content into persistent storage or CMS-managed records.
+
+## Current Backend Structure
+
+```text
+backend/
+  app/
+    main.py
+    api/routes/
+      onboarding.py
+      courses.py
+      placement.py
+      exercises.py
+      quizzes.py
+      progress.py
+      themes.py
+    models/
+      domain.py
+      schemas.py
+    repositories/
+      content_repository.py
+      progress_repository.py
+      theme_repository.py
+      user_repository.py
+    services/
+      auth_service.py
+      account_service.py
+      badge_service.py
+      content_service.py
+      exercise_service.py
+      placement_service.py
+      progress_service.py
+      quiz_service.py
+      recommendation_service.py
+      theme_service.py
+  tests/
+    test_engines.py
+    test_auth.py
+    test_persistence.py
+```
+
+## Current Frontend Structure
+
+```text
+frontend/
+  src/
+    App.tsx
+    api.ts
+    main.tsx
+    styles.css
+    types.ts
+    vite-env.d.ts
+```
+
+The current frontend is a single-page MVP shell. It intentionally keeps the
+journey visible in one app while the backend owns grading, scoring,
+recommendations, progress, and badges.
+
+## Main Domain Model
+
+### Language
 
 Represents a curriculum language or subject area.
 
 Examples:
 
-Python Java JavaScript SQL AI Agents
+- Python
+- Java
+- JavaScript
+- SQL
+- AI Agents
 
-Fields may include:
-
-id name slug description is_active Course
+### Course
 
 A learning path within a language or subject.
 
-Examples:
+Current seed:
 
-Python for Beginners Python for Automation Python for Data Analysis Python for
-AI Builders
+- Python Demo Path
 
-Fields may include:
+Future examples:
 
-id language_id title slug description target_audience difficulty
-estimated_duration is_active Module
+- Python for Beginners
+- Python for Automation
+- Python for Data Analysis
+- Python for AI Builders
 
-A major section inside a course.
-
-Example:
-
-Course: Python for Beginners Module: Variables and Data
-
-Fields may include:
-
-id course_id title description order_index unlock_rule Topic
-
-A focused learning concept inside a module.
-
-Examples:
-
-print() variables strings for loops functions
-
-Fields may include:
-
-id module_id title description order_index Lesson
+### Lesson
 
 Instructional content for a topic.
 
-Fields may include:
+Current seed:
 
-id topic_id title body code_examples estimated_minutes order_index Exercise
+- What is `print()`?
+
+### Exercise
 
 An interactive coding challenge.
 
-Fields may include:
+Current seed:
 
-id lesson_id title instructions starter_code language_id grader_type
-grader_config solution_reference order_index
+- Print Hello World
 
-Supported grader types:
+Supported initial grader types:
 
-output_match code_contains code_not_contains unit_test manual_project_rubric
-Quiz
+- `output_match`
+- `code_contains`
+- `code_not_contains`
+- `unit_test`
+- `manual_project_rubric`
+
+Only `output_match` is implemented in the current seed exercise.
+
+### Quiz
 
 A knowledge check.
 
-Fields may include:
+Quiz questions and correct answers must be stored server-side. The frontend
+receives questions and choices, but not correct answers before submission.
 
-id lesson_id title passing_score order_index
-
-Quiz questions and correct answers must be stored server-side.
-
-Frontend should not receive correct answers before submission.
-
-Project
-
-A larger applied assignment.
-
-Examples:
-
-greeting app number guessing game calculator quiz game expense tracker chatbot
-AI agent
-
-Fields may include:
-
-id course_id module_id title description instructions rubric difficulty
-order_index Placement Assessment
+### Placement Assessment
 
 Used to determine the learner's starting level.
 
-Fields may include:
+The current seed placement grades three questions and recommends a starting
+lesson.
 
-id course_id title passing_score recommendation_rules
-
-A placement result may recommend:
-
-start selected course start easier course skip first module review prerequisite
-topics Learner Profile
+### Learner Profile
 
 Stores information used to personalize recommendations.
 
-Fields may include:
+Current fields include:
 
-id user_id age_range experience_level learning_goal preferred_style
-motivation_type selected_theme_id
+- age range
+- experience level
+- learning goal
+- preferred style
+- motivation type
+- selected theme
 
 Personalization must not rely on gender stereotypes.
 
-Theme
+### Theme
 
-Represents a user-selectable presentation style for the platform.
+Represents a user-selectable presentation style.
+
+Current themes:
+
+- Explorer
+- Builder
+- Minimal
 
 Themes may define:
 
-id name slug description color_tokens image_tokens icon_style illustration_style
-layout_density tone is_active
-
-Theme tokens may control:
-
-primary color secondary color accent color background color surface color hero
-image lesson image badge image icon set illustration style
+- color tokens
+- image tokens
+- icon style
+- illustration style
+- layout density
+- tone
 
 Themes must not define or change:
 
-course content lesson content exercise instructions quiz answers grading rules
-placement scoring recommendation rules progress logic unlock rules
+- course content
+- lesson content
+- exercise instructions
+- quiz answers
+- grading rules
+- placement scoring
+- recommendation rules
+- progress logic
+- unlock rules
 
-Themes are selected by the learner or inferred from explicit preference and
-motivation. They must never be selected from gender stereotypes.
-
-Progress
+### Progress
 
 Tracks learner activity.
 
-Fields may include:
+Current MVP progress includes:
 
-user_id course_id lesson_id exercise_id quiz_id project_id status score
-completed_at attempts Badge
+- XP
+- streak
+- completed lessons
+- completed exercises
+- completed quizzes
+- placement scores
+- badges
+
+### Badge
 
 Represents achievements.
 
-Examples:
+Current seed badges include:
 
-First Lesson Complete First Exercise Solved Perfect Quiz Python Starter Project
-Builder
+- First Code Run
+- Python Starter
+- Perfect Quiz
 
-Fields may include:
+## Core Engines
 
-id title description criteria icon Core Engines
+### Content Engine
 
-1. Content Engine
+Retrieves and organizes learning content.
 
-Responsible for retrieving and organizing:
+The current implementation uses `ContentService` and `ContentRepository`.
 
-languages courses modules topics lessons exercises quizzes projects
+### Recommendation Engine
 
-The Content Engine should not care whether data comes from JSON, SQLite,
-PostgreSQL, or CMS.
+Recommends courses and next steps based on learner profile fields.
 
-1. Recommendation Engine
+The current implementation recommends the Python Demo Path.
 
-Responsible for recommending courses and next steps.
+### Placement Engine
 
-Inputs may include:
+Grades placement answers in the backend and returns a starting recommendation.
 
-learner profile age range experience level learning goal placement result
-progress course prerequisites
+### Exercise Engine
 
-Outputs may include:
+Loads an exercise, runs submitted code through a limited demo runner, grades the
+result, updates progress, and awards XP/badges.
 
-recommended course recommended starting module prerequisite recommendation next
-best lesson
+The current runner blocks imports, file access, input, dynamic execution, and
+some dangerous tokens. This is only a demo safety layer, not a production
+sandbox.
 
-1. Placement Engine
+### Quiz Engine
 
-Responsible for evaluating whether a selected course is appropriate.
+Delivers questions without answers, grades submissions in the backend, returns
+score/explanations, and updates progress.
 
-Flow:
+### Progress Engine
 
-User selects course ↓ Platform gives short placement assessment ↓ Backend grades
-assessment ↓ Platform recommends starting point
+Tracks completed learning actions, XP, streak, placement scores, and badges.
 
-Example result:
+### Badge Engine
 
-You selected Python for Data Analysis, but your placement score suggests
-starting with Python for Beginners first.
+Awards rule-based achievements.
 
-1. Exercise Engine
+### Theme Engine
 
-Responsible for interactive coding exercises.
+Resolves the learner's selected presentation theme and provides theme tokens to
+the frontend.
 
-Responsibilities:
+Theme choice is presentation only. It must stay separate from content,
+recommendation, placement, grading, progress, and badges.
 
-load exercise provide starter code run submitted code grade answer return result
-update progress award XP if appropriate
+### Account/Auth System
 
-Frontend should display the editor and result.
+Backend auth is implemented with registration, login, logout, current-user
+lookup, password hashing, signed JWT session tokens, and progress merge support.
 
-Backend should run and grade.
+The frontend still needs full register/login screens. It currently shows a
+placeholder save-progress prompt after the learner has tried the sample content.
 
-1. Quiz Engine
+### Tutor Engine
 
-Responsible for quiz delivery and grading.
+Future AI-powered support. It is not implemented in the MVP skeleton.
 
-Rules:
+## Frontend Pages And Flow
 
-frontend receives questions and answer choices frontend does not receive correct
-answers before submission backend grades quiz backend returns score,
-explanations, and progress updates
+The current MVP is a single-page flow with these states:
 
-1. Project Engine
+- Start
+- Recommendations
+- Placement
+- Lesson
+- Quiz
+- Save
 
-Responsible for larger assignments.
+Current UI behavior:
 
-Projects may be automatically graded, manually reviewed, or rubric-based.
+- XP, streak, and badge count live in the top bar.
+- Landing includes a compact Python value intro.
+- Onboarding asks one question at a time.
+- Learning pages use a compact context strip instead of a large hero.
+- Theme can be selected without changing curriculum or grading.
 
-Initial implementation can use rubric placeholders.
+## Minimal Seed Content
 
-1. Progress Engine
+Current seed content:
 
-Responsible for tracking:
+```text
+Language: Python
+Course: Python Demo Path
+Lesson: What is print()?
+Exercise: Print Hello World
+Quiz: print() Basics Check
+Placement: Python Starting Point Check
+Themes: Explorer, Builder, Minimal
+```
 
-completed lessons completed exercises quiz scores placement scores projects XP
-badges course progress
+This is not the real course. It only proves the framework works end to end.
 
-1. Badge Engine
-
-Responsible for awarding achievements.
-
-Badges should be rule-based.
-
-Examples:
-
-If learner completes first exercise, award "First Code Run". If learner scores
-100% on a quiz, award "Perfect Quiz".
-
-1. Tutor Engine
-
-Future AI-powered support.
-
-Initial implementation may be static hints.
-
-Future implementation may provide:
-
-hints error explanations recommended next steps encouragement concept review
-
-Tutor should not immediately give full solutions.
-
-1. Theme Engine
-
-Responsible for resolving the learner's selected presentation theme.
-
-Responsibilities:
-
-load available themes validate selected theme resolve color/image/icon tokens
-provide theme data to the frontend persist learner theme preference
-
-The Theme Engine is a presentation system. It must stay separate from the
-Content Engine, Recommendation Engine, Placement Engine, Exercise Engine, Quiz
-Engine, Progress Engine, and Badge Engine.
-
-The same course, lesson, exercise, quiz, or project should render correctly
-under multiple themes without changing learning content or backend outcomes.
-
-Frontend Architecture
-
-Suggested pages:
-
-/ Landing Page
-
-/onboarding Quick learner profile and goals
-
-/recommendations Recommended courses
-
-/courses Course catalog
-
-/courses/:courseSlug Course overview
-
-/courses/:courseSlug/placement Placement assessment
-
-/learn/:courseSlug Course learning dashboard
-
-/lessons/:lessonId Lesson page
-
-/exercises/:exerciseId Interactive exercise page
-
-/quizzes/:quizId Quiz page
-
-/projects/:projectId Project page
-
-/progress Progress dashboard
-
-/account Account creation / login
-
-Suggested components:
-
-LandingHero GoalSelector LearnerProfileForm CourseCard RecommendationCard
-PlacementAssessment LessonViewer CodeEditor ExerciseRunner QuizQuestion
-ProjectBrief ProgressBar BadgeList ThemeSelector AccountPrompt Backend
-Architecture
-
-Suggested structure:
-
-backend/ app/ main.py api/ routes/ onboarding.py courses.py placement.py
-lessons.py exercises.py quizzes.py projects.py progress.py themes.py auth.py services/
-content_service.py recommendation_service.py placement_service.py
-exercise_service.py quiz_service.py project_service.py progress_service.py
-badge_service.py theme_service.py tutor_service.py repositories/ course_repository.py
-content_repository.py user_repository.py progress_repository.py
-assessment_repository.py theme_repository.py models/ database.py schemas.py domain.py runners/
-base_runner.py python_runner.py future_java_runner.py
-future_javascript_runner.py future_sql_runner.py graders/ base_grader.py
-output_match_grader.py code_contains_grader.py unit_test_grader.py db/
-session.py migrations/ tests/ Database-First Direction
-
-The product should be designed around database-backed content.
-
-However, early development may use tiny seed data.
-
-The important rule:
-
-No frontend component should care where content comes from.
-
-Eventually, content should be manageable through an admin interface or CMS.
-
-Minimal Seed Content
-
-Although the platform is framework-first, it should not be completely empty.
-
-Use tiny demo content to test the flow.
-
-Example:
-
-Language: Python Course: Python Demo Path Module: Demo Module Topic: print()
-Lesson: What is print()? Exercise: Print Hello Quiz: 2 questions Placement: 3
-questions
-
-This is not the real course.
-
-It only proves the system works.
-
-Account Flow
-
-The platform should allow anonymous exploration first.
-
-Anonymous user can:
-
-answer profile questions see recommendations take placement try a sample lesson
-or exercise
-
-Then prompt:
-
-Create an account to save your progress.
-
-Account creation should come after value is shown.
-
-Gamification Layer
-
-Gamification should be separate from curriculum.
-
-Supported features:
-
-XP badges progress bars ranks streak placeholder
-
-Gamification should encourage learning, not replace learning.
-
-Themes
-
-Themes are presentation layers.
-
-They should not change the underlying curriculum.
-
-Learners should be able to choose a theme that changes the look and feel of the
-page, including colors, images, icons, illustration style, and optional tone.
-Theme choice should be stored as part of the learner profile or anonymous
-session and applied consistently across landing, onboarding, recommendations,
-lessons, exercises, quizzes, projects, and progress views.
-
-Examples:
-
-Explorer Theme Builder Theme Creator Theme Minimal Theme Competitive Theme
-
-The same lesson can be rendered with different tone and visuals.
-
-Do not base themes on gender stereotypes.
-
-Long-Term Vision
-
-The long-term vision is:
-
-Learning Platform Framework ↓ Python Curriculum ↓ Real Projects ↓ AI Agents ↓
-More Curricula
+## Long-Term Vision
+
+```text
+Learning Platform Framework
+  -> Python Curriculum
+  -> Real Projects
+  -> AI Agents
+  -> More Curricula
+```
 
 The architecture should make this possible without a major rewrite.

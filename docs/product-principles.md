@@ -4,7 +4,7 @@
 
 PyVenturer is a learning platform framework first.
 
-Do not start by building a massive Python course; first build the system that
+Do not start by building a massive Python course. First build the system that
 can support:
 
 - courses
@@ -18,14 +18,23 @@ can support:
 - recommendations
 - progress
 - badges
+- themes
+- accounts
 
-Content can be added later.
+The current MVP skeleton implements a tiny end-to-end framework flow with seed
+content. Real curriculum can be added later.
 
 ## 2. Python First, Not Python Only
 
 Python is the first curriculum. The architecture should eventually support other
-curricula (for example: Java, JavaScript, SQL, AI Agents, Data Engineering,
-Cloud Technologies).
+curricula, for example:
+
+- Java
+- JavaScript
+- SQL
+- AI Agents
+- Data Engineering
+- Cloud Technologies
 
 Do not overbuild future language support now, and do not hardcode the platform
 around Python only.
@@ -39,11 +48,11 @@ Preferred flow:
 
 ```text
 Landing Page
-→ Quick Profile
-→ Recommendation
-→ Placement Check
-→ Try Sample Lesson
-→ Create Account To Save Progress
+-> Quick Profile
+-> Recommendation
+-> Placement Check
+-> Try Sample Lesson
+-> Create Account To Save Progress
 ```
 
 Registration should feel like a benefit.
@@ -78,8 +87,8 @@ Courses, lessons, quizzes, exercises, and projects should come from data.
 Do not hardcode curriculum into React or hardcode recommendations into UI
 components.
 
-The platform should eventually allow content to be added through database
-records or an admin tool.
+The current MVP uses in-memory seed repositories. Future versions should move
+content into database records or an admin/CMS workflow.
 
 ## 6. Backend Owns Truth
 
@@ -105,13 +114,14 @@ Personalization should be based on:
 - motivation
 - placement result
 - progress
+- selected theme
 
 Do not assume interests based on gender. Themes should be chosen by preference
 or motivation.
 
 Theme selection may change the page's colors, images, icon style, illustration
-style, and optional UI tone. It must not change the curriculum, placement
-scoring, grading, recommendations, progress rules, or unlock rules.
+style, and optional UI tone. It must not change curriculum, placement scoring,
+grading, recommendations, progress rules, or unlock rules.
 
 ## 8. Light Gamification, Serious Learning
 
@@ -129,14 +139,16 @@ The core outcome is skill development.
 ## 9. Build Small, Test End-To-End
 
 Do not build empty architecture only. Use tiny demo content to test the full
-journey. Example:
+journey.
+
+Current MVP seed flow:
 
 ```text
 Python Demo Path
-→ print() lesson
-→ one exercise
-→ two-question quiz
-→ short placement check
+-> print() lesson
+-> one exercise
+-> two-question quiz
+-> short placement check
 ```
 
 This proves the framework works.
@@ -169,7 +181,7 @@ Courses should be designed around learner goals. Examples:
 - Python for AI Builders
 - Python for Games
 
-Do not make courses only lists of topics; connect topics to outcomes.
+Do not make courses only lists of topics. Connect topics to outcomes.
 
 ## 12. Projects Matter
 
@@ -191,14 +203,25 @@ The learner should feel: "I am learning because I can build something."
 
 Do not build every future feature now.
 
-Build clean boundaries instead. Implement a small set of core systems first
-(Python runner, simple recommendation flow, simple placement flow, simple
-progress flow) and leave clean extension points for later.
+Build clean boundaries instead. Implement a small set of core systems first:
+
+- Python runner
+- simple recommendation flow
+- simple placement flow
+- simple progress flow
+- simple theme flow
+
+Leave clean extension points for later.
 
 ## 14. Make It Feel Helpful Immediately
 
-A first-time user should quickly understand what PyVenturer is, what they can
-learn, where they should start, and why creating an account helps.
+A first-time user should quickly understand:
+
+- what PyVenturer is
+- why Python matters
+- what they can learn
+- where they should start
+- why creating an account helps
 
 The experience should feel guided, not overwhelming.
 
@@ -224,8 +247,10 @@ and should be based on explicit preference or motivation, not stereotypes.
 
 ## 16. The Platform Is The Product
 
-The long-term value is the learning framework. The framework should make it easy
-to add:
+The long-term value is not one course. The long-term value is the learning
+framework.
+
+The framework should make it easy to add:
 
 - new courses
 - new curricula
@@ -233,34 +258,3 @@ to add:
 - new projects
 - new themes
 - new assessment types
-
-Do not build every future feature now.
-
-Build clean boundaries instead.
-
-Implement:
-
-Python first one simple runner one simple recommendation flow one simple
-placement flow one simple progress flow
-
-Leave clean extension points for later.
-
-1. Make It Feel Helpful Immediately
-
-A first-time user should quickly understand:
-
-what PyVenturer is what they can learn where they should start why creating an
-account helps
-
-The experience should feel guided, not overwhelming.
-
-1. The Platform Is The Product
-
-The long-term value is not one course.
-
-The long-term value is the learning framework.
-
-The framework should make it easy to add:
-
-new courses new curricula new audiences new projects new themes new assessment
-types

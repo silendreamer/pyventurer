@@ -5,9 +5,9 @@
 PyVenturer is a framework-first learning platform for coding and technical
 skills.
 
-The first curriculum will be Python. The platform is designed so future
-curricula can support Java, JavaScript, SQL, AI Agents, Data Engineering, Cloud
-Technologies, and other technical subjects.
+The first curriculum is Python. The platform is designed so future curricula can
+support Java, JavaScript, SQL, AI Agents, Data Engineering, Cloud Technologies,
+and other technical subjects.
 
 ## What PyVenturer Is
 
@@ -29,10 +29,45 @@ It is a learning platform framework that supports:
 - user-selectable themes
 - future AI tutoring
 
+## Current MVP
+
+The MVP skeleton is implemented.
+
+Implemented:
+
+- FastAPI backend with thin API routes
+- service and repository layers
+- in-memory seed data for the Python Demo Path
+- one `print()` lesson
+- one backend-graded exercise
+- one backend-graded quiz
+- one placement check
+- learner profile onboarding
+- course recommendation flow
+- anonymous try-before-register experience
+- backend auth endpoints for register, login, logout, and current user
+- frontend placeholder account creation prompt
+- progress, XP, streak, and badges
+- SQLite-backed learner profile, user, and progress persistence
+- user-selectable themes from backend-provided theme tokens
+- React/Vite frontend with staged onboarding and interactive lesson flow
+- backend tests for recommendation, placement, exercise grading, quiz grading,
+  runner safety, theme defaults, auth, and persistence
+
+Not implemented yet:
+
+- frontend register/login screens
+- full Python curriculum
+- admin/CMS content management
+- production-safe sandboxed Python runner
+- Monaco editor integration
+- AI tutor
+- projects workflow
+- deployment
+
 ## Core Product Idea
 
-The platform should help a learner move from a simple first program to building
-real things:
+The platform should help a learner move from a simple first program:
 
 ```python
 print("Hello World")
@@ -77,14 +112,11 @@ model.
 
 ## Framework First
 
-Framework First
+The first development goal is not to create a full Python course. The first
+development goal is to create the platform framework:
 
-The first development goal is not to create a full Python course.
-
-The first development goal is to create the platform framework:
-
-Landing Page → Learner Profile → Course Recommendations → Placement Check → Try
-Sample Content → Create Account To Save Progress → Continue Learning
+Landing Page -> Learner Profile -> Course Recommendations -> Placement Check ->
+Try Sample Content -> Create Account To Save Progress -> Continue Learning
 
 Only tiny seed content should be added at first to test the end-to-end flow.
 
@@ -92,18 +124,22 @@ Only tiny seed content should be added at first to test the end-to-end flow.
 
 Users should not be forced to create an account immediately.
 
-The preferred flow is:
+The implemented MVP flow is:
 
-User lands on the site. User answers a few quick questions. Platform recommends
-a course or path. User takes a short placement check. User sees a recommended
-starting point. User tries a sample lesson or exercise. User is asked to create
-an account to save progress.
+1. User lands on the site and sees why Python is useful.
+2. User answers staged questions about age range, skill level, goal, learning
+   style, and theme.
+3. Platform recommends a course or path.
+4. User takes a short placement check.
+5. User sees a recommended starting point.
+6. User tries a sample lesson or exercise.
+7. User is asked to create an account to save progress.
 
 Registration should come after the user understands the value.
 
 ## User-Selectable Themes
 
-PyVenturer should allow learners to choose a visual theme for the experience.
+PyVenturer allows learners to choose a visual theme for the experience.
 
 Themes may change:
 
@@ -126,12 +162,15 @@ Themes must not change:
 Theme selection should be based on learner preference or motivation, not gender
 or stereotypes.
 
-Example theme directions:
+Implemented theme directions:
 
 - Explorer
 - Builder
-- Creator
 - Minimal
+
+Future theme directions may include:
+
+- Creator
 - Competitive
 - Classroom
 
@@ -140,21 +179,32 @@ different themes without changing the underlying learning content.
 
 ## First Curriculum
 
-The first real curriculum will be:
-
-Python
+The first real curriculum will be Python.
 
 Possible future Python paths:
 
-Python for Absolute Beginners Python for Kids Python for Teens Python for
-Automation Python for Data Analysis Python for Games Python for AI Builders
+- Python for Absolute Beginners
+- Python for Kids
+- Python for Teens
+- Python for Automation
+- Python for Data Analysis
+- Python for Games
+- Python for AI Builders
+
+The current Python Demo Path is tiny seed content. It is not the full course.
 
 ## Future Curricula
 
 The architecture should eventually support:
 
-Java JavaScript SQL AI Agents Data Engineering Cloud Technologies Cloud
-Automation Other technical subjects
+- Java
+- JavaScript
+- SQL
+- AI Agents
+- Data Engineering
+- Cloud Technologies
+- Cloud Automation
+- Other technical subjects
 
 The platform should not need a rewrite to support these.
 
@@ -167,26 +217,23 @@ User Learner Profile Theme Progress Badge Recommendation Technical Direction
 
 ## Preferred Stack
 
-Preferred stack:
+Current MVP stack:
 
 Frontend:
 
-React TypeScript Vite TailwindCSS Monaco Editor
+React TypeScript Vite custom CSS
 
 Backend:
 
-FastAPI Python SQLite for early MVP PostgreSQL later SQLModel or SQLAlchemy-
-compatible structure Repository and service pattern
+FastAPI Python SQLite Repository and service pattern
 
-## Current Status
+Future stack direction:
 
-Planning and framework design.
-
-The next step is to build the platform skeleton with:
-
-database tables APIs basic UI flow tiny seed/demo content placement flow
-recommendation flow anonymous try-before-register experience account creation
-for saved progress Development Principle
+- PostgreSQL
+- SQLModel or SQLAlchemy-compatible persistence
+- CMS/admin content management
+- Monaco editor
+- production-safe runner isolation
 
 ## Development Principle
 

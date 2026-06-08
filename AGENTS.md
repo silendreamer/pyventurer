@@ -90,11 +90,11 @@ Preferred user journey:
 
 ```text
 Landing Page
-→ Quick Goal/Profile Questions
-→ Recommended Courses
-→ Placement Check
-→ Try Sample Lesson or Exercise
-→ Ask User To Create Account To Save Progress
+-> Quick Goal/Profile Questions
+-> Recommended Courses
+-> Placement Check
+-> Try Sample Lesson or Exercise
+-> Ask User To Create Account To Save Progress
 ```
 
 Account creation should feel useful, not forced.
@@ -127,7 +127,7 @@ Backend should expose stable API contracts.
 
 Preferred backend layering:
 
-API Routes → Services → Repositories → Database Backend Is Source of Truth
+API Routes -> Services -> Repositories -> Database Backend Is Source of Truth
 
 Frontend renders the experience.
 
@@ -222,6 +222,12 @@ structured learning platform interactive coding environment light gamification
 adaptive course guide
 
 Avoid building the entire product around a grid world or character movement.
+
+Current MVP UI state:
+
+The app uses a compact Python value intro, staged onboarding questions, XP and
+badge summary in the top bar, a compact learning context strip after onboarding,
+and a wide lesson/exercise workspace.
 
 Gamification
 
