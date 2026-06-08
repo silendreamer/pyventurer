@@ -34,7 +34,9 @@ def test_curriculum_tree_exposes_course_module_lesson_hierarchy():
     assert first_module["title"] == "Python Basics"
     assert first_module["lessons"][0]["id"] == "lesson-print"
     assert first_module["lessons"][0]["implemented"] is True
-    assert first_module["lessons"][1]["implemented"] is False
+    assert first_module["lessons"][1]["id"] == "lesson-variables"
+    assert first_module["lessons"][1]["implemented"] is True
+    assert first_module["lessons"][2]["implemented"] is False
 
 
 def test_placement_scores_on_backend():

@@ -78,7 +78,25 @@ class ContentRepository:
                 ),
                 code_examples=['print("Hello World")', 'print("I can build with Python")'],
                 estimated_minutes=4,
-            )
+            ),
+            Lesson(
+                id="lesson-variables",
+                course_id="python-demo",
+                topic="variables",
+                title="Variables",
+                body=(
+                    "A variable is a name that refers to a value. You create one with the = sign. "
+                    "Variable names must start with a letter or underscore, contain only letters, "
+                    "digits, and underscores, and cannot be a Python keyword. Once created, you "
+                    "can use a variable anywhere you would use its value — including inside print()."
+                ),
+                code_examples=[
+                    'name = "Ada"',
+                    'print(name)',
+                    'age = 30\nprint(age)',
+                ],
+                estimated_minutes=5,
+            ),
         ]
         self.exercises = [
             Exercise(
@@ -90,7 +108,17 @@ class ContentRepository:
                 language_id="python",
                 grader_type="output_match",
                 grader_config={"expected_output": "Hello World"},
-            )
+            ),
+            Exercise(
+                id="exercise-variables-greeting",
+                lesson_id="lesson-variables",
+                title="Greet with a Variable",
+                instructions='Create a variable called greeting and set it to "Hello PyVenturer", then print it.',
+                starter_code='greeting = ""\nprint(greeting)',
+                language_id="python",
+                grader_type="output_match",
+                grader_config={"expected_output": "Hello PyVenturer"},
+            ),
         ]
         self.quizzes = [
             Quiz(
@@ -122,7 +150,36 @@ class ContentRepository:
                         explanation="This is real Python syntax for displaying text.",
                     ),
                 ],
-            )
+            ),
+            Quiz(
+                id="quiz-variables-basics",
+                lesson_id="lesson-variables",
+                title="Variables Check",
+                passing_score=100,
+                questions=[
+                    QuizQuestionWithAnswer(
+                        id="v1",
+                        prompt="Which symbol assigns a value to a variable in Python?",
+                        choices=["=", "==", ":"],
+                        correct_choice="=",
+                        explanation="A single equals sign (=) is the assignment operator.",
+                    ),
+                    QuizQuestionWithAnswer(
+                        id="v2",
+                        prompt="Which is a valid Python variable name?",
+                        choices=["my_score", "2fast", "my-var"],
+                        correct_choice="my_score",
+                        explanation="Variable names cannot start with a digit or contain hyphens.",
+                    ),
+                    QuizQuestionWithAnswer(
+                        id="v3",
+                        prompt='What does this print?\nx = 5\nprint(x)',
+                        choices=["5", "x", "print"],
+                        correct_choice="5",
+                        explanation="print(x) outputs the value stored in x, which is 5.",
+                    ),
+                ],
+            ),
         ]
         self.placement_assessments = [
             PlacementAssessment(
@@ -180,7 +237,7 @@ class ContentRepository:
                                             "id": "lesson-variables",
                                             "title": "Variables",
                                             "topic": "variables",
-                                            "implemented": False,
+                                            "implemented": True,
                                         },
                                         {
                                             "id": "lesson-strings",

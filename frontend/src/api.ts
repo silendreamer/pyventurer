@@ -32,6 +32,7 @@ export const api = {
       body: JSON.stringify({ anonymous_user_id: anonymousUserId, profile }),
     }),
   course: (slug: string) => request(`/courses/${slug}`),
+  lessonBundle: (lessonId: string) => request(`/lessons/${lessonId}`),
   placement: (courseId: string) => request(`/courses/${courseId}/placement`),
   submitPlacement: (anonymousUserId: string, courseId: string, answers: Record<string, string>) =>
     request(`/courses/${courseId}/placement`, {

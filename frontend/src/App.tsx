@@ -100,6 +100,7 @@ function App() {
   const [accountMessage, setAccountMessage] = useState("");
   const [apiMessage, setApiMessage] = useState("");
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null);
+  const [currentQuizId, setCurrentQuizId] = useState("");
 
   useEffect(() => {
     Promise.all([api.themes(), api.progress(anonymousUserId), api.curriculum()])
@@ -162,6 +163,7 @@ function App() {
     setLesson(course.lesson);
     setExercise(course.exercise);
     setCode(course.exercise.starter_code);
+    setCurrentQuizId(course.quiz.id);
     setPlacement(placementData as Placement);
     setStep("placement");
   }
@@ -175,16 +177,24 @@ function App() {
     setLesson(course.lesson);
     setExercise(course.exercise);
     setCode(course.exercise.starter_code);
+    setCurrentQuizId(course.quiz.id);
     setPlacement(placementData as Placement);
     setStep(targetStep);
   }
 
-  async function openCurriculumLesson(courseSlug: string, lessonId: string) {
-    if (courseSlug !== "python-demo-path" || lessonId !== "lesson-print") return;
-    if (!lesson || !exercise) {
-      await loadDemoCourse("lesson");
-      return;
-    }
+  async function openCurriculumLesson(_courseSlug: string, lessonId: string) {
+    const bundle = (await api.lessonBundle(lessonId)) as {
+      lesson: Lesson;
+      exercise: Exercise;
+      quiz: { id: string };
+    };
+    setLesson(bundle.lesson);
+    setExercise(bundle.exercise);
+    setCode(bundle.exercise.starter_code);
+    setCurrentQuizId(bundle.quiz.id);
+    setRunResult(null);
+    setQuizAnswers({});
+    setQuizResult("");
     setStep("lesson");
   }
 
@@ -221,7 +231,8 @@ function App() {
   }
 
   async function loadQuiz() {
-    const loadedQuiz = (await api.quiz("quiz-print-basics")) as Quiz;
+    if (!currentQuizId) return;
+    const loadedQuiz = (await api.quiz(currentQuizId)) as Quiz;
     setQuiz(loadedQuiz);
     setStep("quiz");
   }
