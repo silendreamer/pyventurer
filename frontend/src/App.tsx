@@ -101,6 +101,7 @@ function App() {
   const [apiMessage, setApiMessage] = useState("");
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null);
   const [currentQuizId, setCurrentQuizId] = useState("");
+  const [progressUserId, setProgressUserId] = useState(anonymousUserId);
 
   useEffect(() => {
     Promise.all([api.themes(), api.progress(anonymousUserId), api.curriculum()])
@@ -117,7 +118,12 @@ function App() {
         setApiMessage("Backend connection is unavailable. Showing the local starter experience.");
       });
     api.me()
-      .then((data) => setUser((data as { user: { id: string; email: string; name: string } }).user))
+      .then(async (data) => {
+        setUser((data as { user: { id: string; email: string; name: string } }).user);
+        const savedProgress = (await api.myProgress()) as Progress;
+        setProgress(savedProgress);
+        setProgressUserId(savedProgress.anonymous_user_id);
+      })
       .catch(() => {});
   }, []);
 
@@ -170,7 +176,7 @@ function App() {
 
   async function loadDemoCourse(targetStep = "placement") {
     const [courseData, placementData] = await Promise.all([
-      api.course("python-demo-path"),
+      api.course("python-for-beginners"),
       api.placement("python-demo"),
     ]);
     const course = courseData as { lesson: Lesson; exercise: Exercise; quiz: { id: string } };
@@ -200,18 +206,18 @@ function App() {
 
   async function submitPlacement() {
     if (!placement) return;
-    const result = (await api.submitPlacement(anonymousUserId, placement.course_id, placementAnswers)) as {
+    const result = (await api.submitPlacement(progressUserId, placement.course_id, placementAnswers)) as {
       score: number;
       recommendation: string;
     };
     setPlacementResult(`${result.score}% - ${result.recommendation}`);
-    const updatedProgress = (await api.progress(anonymousUserId)) as Progress;
+    const updatedProgress = (await api.progress(progressUserId)) as Progress;
     setProgress(updatedProgress);
   }
 
   async function completeLesson() {
     if (!lesson || !exercise) return;
-    const updated = (await api.completeLesson(anonymousUserId, lesson.id)) as Progress;
+    const updated = (await api.completeLesson(progressUserId, lesson.id)) as Progress;
     setProgress(updated);
     const loadedExercise = (await api.exercise(exercise.id)) as Exercise;
     setExercise(loadedExercise);
@@ -220,7 +226,7 @@ function App() {
 
   async function runExercise() {
     if (!exercise) return;
-    const result = (await api.submitExercise(anonymousUserId, exercise.id, code)) as {
+    const result = (await api.submitExercise(progressUserId, exercise.id, code)) as {
       passed: boolean;
       output: string;
       message: string;
@@ -239,7 +245,7 @@ function App() {
 
   async function submitQuiz() {
     if (!quiz) return;
-    const result = (await api.submitQuiz(anonymousUserId, quiz.id, quizAnswers)) as {
+    const result = (await api.submitQuiz(progressUserId, quiz.id, quizAnswers)) as {
       score: number;
       passed: boolean;
       progress: Progress;
@@ -255,6 +261,9 @@ function App() {
         message: string;
       };
       setUser(result.user);
+      const savedProgress = (await api.myProgress()) as Progress;
+      setProgress(savedProgress);
+      setProgressUserId(savedProgress.anonymous_user_id);
       setAccountMessage(result.message);
     } catch {
       setAccountMessage("Registration failed. Email may already be in use.");
@@ -267,6 +276,9 @@ function App() {
         user: { id: string; email: string; name: string };
       };
       setUser(result.user);
+      const savedProgress = (await api.myProgress()) as Progress;
+      setProgress(savedProgress);
+      setProgressUserId(savedProgress.anonymous_user_id);
       setAccountMessage("Welcome back!");
     } catch {
       setAccountMessage("Invalid email or password.");
@@ -276,6 +288,9 @@ function App() {
   async function handleLogout() {
     await api.logout();
     setUser(null);
+    setProgressUserId(anonymousUserId);
+    const anonymousProgress = (await api.progress(anonymousUserId)) as Progress;
+    setProgress(anonymousProgress);
     setAccountMessage("");
   }
 
@@ -340,6 +355,7 @@ function App() {
           languages={curriculum}
           progress={progress}
           currentLessonId={lesson?.id}
+          isLoggedIn={Boolean(user)}
           onOpenLesson={openCurriculumLesson}
         />
         <section className="main-panel">
@@ -408,19 +424,22 @@ function CurriculumSidebar({
   languages,
   progress,
   currentLessonId,
+  isLoggedIn,
   onOpenLesson,
 }: {
   languages: CurriculumLanguage[];
   progress: Progress;
   currentLessonId?: string;
+  isLoggedIn: boolean;
   onOpenLesson: (courseSlug: string, lessonId: string) => void;
 }) {
-  const [openCourses, setOpenCourses] = useState<Record<string, boolean>>({ "python-demo": true });
-  const [openModules, setOpenModules] = useState<Record<string, boolean>>({ "python-basics": true });
+  const [openCourses, setOpenCourses] = useState<Record<string, boolean>>({});
+  const [openModules, setOpenModules] = useState<Record<string, boolean>>({});
   const completedLessons = new Set(progress.completed_lessons);
   const totalLessons = languages.flatMap((language) =>
     language.courses.flatMap((course) => course.modules.flatMap((module) => module.lessons))
   ).length;
+  const lastSaved = findLastSavedLevel(languages, progress.completed_lessons);
 
   function toggleCourse(courseId: string) {
     setOpenCourses((current) => ({ ...current, [courseId]: !current[courseId] }));
@@ -436,6 +455,13 @@ function CurriculumSidebar({
         <span>Curriculum</span>
         <strong>{completedLessons.size}/{totalLessons}</strong>
       </div>
+      {isLoggedIn && (
+        <div className="saved-level">
+          <span>Last saved</span>
+          <strong>{lastSaved.lessonTitle}</strong>
+          <small>{lastSaved.context}</small>
+        </div>
+      )}
       <div className="curriculum-tree">
         {(languages.length ? languages : []).map((language) => (
           <section className="tree-language" key={language.id}>
@@ -507,6 +533,10 @@ function CurriculumCourseNode({
               onOpenLesson={onOpenLesson}
             />
           ))}
+          {course.next_course_slug && (
+            <div className="next-course-card">Next after this course: Python for Intermediate Users</div>
+          )}
+          {!course.modules.length && <div className="next-course-card">Next after this course: {course.status.replace("_", " ")}</div>}
         </div>
       )}
     </div>
@@ -536,43 +566,90 @@ function CurriculumModuleNode({
         <ChevronRight className={open ? "chevron open" : "chevron"} size={15} />
         <span>
           <strong>{module.title}</strong>
-          <small>{module.description}</small>
+          <small>{module.status === "locked" ? "Locked preview" : module.description}</small>
         </span>
       </button>
       {open && (
-        <ol className="lesson-list">
-          {module.lessons.map((item) => {
-            const completed = completedLessons.has(item.id);
-            const current = currentLessonId === item.id;
-            const available = item.implemented;
-            const locked = !completed && !available;
-            return (
-              <li key={item.id}>
-                <button
-                  className={[
-                    "lesson-link",
-                    completed ? "complete" : "",
-                    current ? "current" : "",
-                    locked ? "locked" : "",
-                  ].join(" ")}
-                  disabled={locked}
-                  onClick={() => onOpenLesson(courseSlug, item.id)}
-                >
-                  <span className="lesson-state" aria-hidden="true">
-                    {completed ? <CheckCircle2 size={15} /> : locked ? <Lock size={13} /> : <Play size={13} />}
-                  </span>
-                  <span>
-                    <strong>{item.title}</strong>
-                    <small>{completed ? "Completed" : available ? "Available" : "Locked"}</small>
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+        <div className="module-outline">
+          <ol className="lesson-list">
+            {module.lessons.map((item) => {
+              const completed = completedLessons.has(item.id);
+              const current = currentLessonId === item.id;
+              const available = item.implemented && item.status === "published";
+              const locked = !completed && !available;
+              return (
+                <li key={item.id}>
+                  <button
+                    className={[
+                      "lesson-link",
+                      completed ? "complete" : "",
+                      current ? "current" : "",
+                      locked ? "locked" : "",
+                    ].join(" ")}
+                    disabled={locked}
+                    onClick={() => onOpenLesson(courseSlug, item.id)}
+                  >
+                    <span className="lesson-state" aria-hidden="true">
+                      {completed ? <CheckCircle2 size={15} /> : locked ? <Lock size={13} /> : <Play size={13} />}
+                    </span>
+                    <span>
+                      <strong>{item.title}</strong>
+                      <small>{completed ? "Completed" : available ? "Available" : item.status}</small>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          {module.projects.length > 0 && (
+            <div className="project-list">
+              {module.projects.map((project) => (
+                <div className={project.status === "locked" ? "project-row locked" : "project-row"} key={project.id}>
+                  <Target size={13} />
+                  <span>{project.title}</span>
+                  <small>{project.type === "final" ? "final project" : project.status}</small>
+                </div>
+              ))}
+            </div>
+          )}
+          {module.quiz && (
+            <div className="project-row quiz-row">
+              <CheckCircle2 size={13} />
+              <span>{module.quiz.title}</span>
+              <small>{module.quiz.status}</small>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
+}
+
+function findLastSavedLevel(languages: CurriculumLanguage[], completedLessonIds: string[]) {
+  const lastCompletedId = completedLessonIds[completedLessonIds.length - 1];
+  if (!lastCompletedId) {
+    return {
+      lessonTitle: "Start of Python for Beginners",
+      context: "No saved lesson yet",
+    };
+  }
+  for (const language of languages) {
+    for (const course of language.courses) {
+      for (const module of course.modules) {
+        const lesson = module.lessons.find((item) => item.id === lastCompletedId);
+        if (lesson) {
+          return {
+            lessonTitle: lesson.title,
+            context: `${course.title} / ${module.title}`,
+          };
+        }
+      }
+    }
+  }
+  return {
+    lessonTitle: "Saved progress found",
+    context: "Open the course to continue",
+  };
 }
 
 function ThemeSelector({

@@ -1,3 +1,4 @@
+from app.db.seed_curriculum import seed_curriculum
 from app.models.domain import LearnerProfile
 from app.services.content_service import content_service
 from app.services.exercise_service import exercise_service
@@ -31,12 +32,50 @@ def test_curriculum_tree_exposes_course_module_lesson_hierarchy():
 
     assert python["title"] == "Python"
     assert beginner_course["title"] == "Python for Beginners"
-    assert first_module["title"] == "Python Basics"
-    assert first_module["lessons"][0]["id"] == "lesson-print"
-    assert first_module["lessons"][0]["implemented"] is True
-    assert first_module["lessons"][1]["id"] == "lesson-variables"
-    assert first_module["lessons"][1]["implemented"] is True
-    assert first_module["lessons"][2]["implemented"] is False
+    assert first_module["title"] == "Welcome to Python"
+    assert first_module["lessons"][0]["title"] == "What is Python?"
+    assert first_module["lessons"][3]["id"] == "lesson-your-first-python-program"
+    assert first_module["lessons"][3]["implemented"] is True
+    assert first_module["projects"][0]["title"] == "Run your first Python program"
+
+
+def test_curriculum_seed_is_idempotent():
+    seed_curriculum(content_service.repository.connection)
+    seed_curriculum(content_service.repository.connection)
+
+    lesson_count = content_service.repository.connection.execute("SELECT COUNT(*) FROM lessons").fetchone()[0]
+    module_count = content_service.repository.connection.execute("SELECT COUNT(*) FROM modules").fetchone()[0]
+
+    assert module_count == 15
+    assert lesson_count == 77
+
+
+def test_python_courses_exist_with_intermediate_placeholder():
+    catalog = content_service.get_catalog()
+    courses = {course.slug: course for course in catalog["courses"]}
+
+    assert "python-for-beginners" in courses
+    assert courses["python-for-beginners"].status == "published"
+    assert "python-for-intermediate-users" in courses
+    assert courses["python-for-intermediate-users"].status == "coming_soon"
+
+
+def test_course_outline_returns_modules_in_order():
+    outline = content_service.get_course_outline("python-for-beginners")
+    module_titles = [module["title"] for module in outline["modules"]]
+
+    assert module_titles[0] == "Welcome to Python"
+    assert module_titles[1] == "Printing and Comments"
+    assert module_titles[-1] == "Beginner Projects"
+    assert outline["next_course"]["slug"] == "python-for-intermediate-users"
+
+
+def test_quiz_api_hides_correct_answers():
+    quiz = quiz_service.get_quiz("quiz-print-basics")
+
+    assert "correct_choice" not in quiz["questions"][0]
+    assert "explanation" not in quiz["questions"][0]
+    assert len(quiz["questions"]) == 3
 
 
 def test_placement_scores_on_backend():
@@ -68,7 +107,7 @@ def test_exercise_blocks_dangerous_code():
 def test_quiz_does_not_need_frontend_answers():
     result = quiz_service.submit(
         "quiz-print-basics",
-        {"q1": "Shows output", "q2": 'print("Hello World")'},
+        {"q1": "Shows output", "q2": 'print("Hello World")', "q3": "#"},
         "test-quiz-user",
     )
 

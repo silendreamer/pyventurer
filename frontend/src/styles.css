@@ -324,6 +324,34 @@ h1 {
   color: var(--primary);
 }
 
+.saved-level {
+  display: grid;
+  gap: 2px;
+  margin: 0 2px 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary) 7%, white);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.saved-level span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.saved-level strong {
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.25;
+}
+
+.saved-level small {
+  color: var(--muted);
+  line-height: 1.3;
+}
+
 .curriculum-tree,
 .tree-children,
 .lesson-list {
@@ -429,6 +457,11 @@ h1 {
   padding: 0;
 }
 
+.module-outline {
+  display: grid;
+  gap: 6px;
+}
+
 .lesson-link {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
@@ -463,6 +496,52 @@ h1 {
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.08);
   color: var(--muted);
+}
+
+.project-list {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 8px 4px;
+}
+
+.project-row,
+.next-course-card {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: rgba(15, 23, 42, 0.04);
+  font-size: 0.78rem;
+}
+
+.project-row span {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.project-row small {
+  text-transform: capitalize;
+}
+
+.project-row.locked {
+  opacity: 0.62;
+}
+
+.quiz-row {
+  margin-left: 4px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 7%, white);
+}
+
+.next-course-card {
+  grid-template-columns: 1fr;
+  margin: 6px 0;
+  color: var(--primary);
+  font-weight: 800;
 }
 
 .compact-panel {

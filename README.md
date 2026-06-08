@@ -37,11 +37,10 @@ Implemented:
 
 - FastAPI backend with thin API routes
 - service and repository layers
-- in-memory seed data for Python for Beginners
+- SQLite-backed curriculum tables and seed data for Python for Beginners
 - backend-fed curriculum tree with Language -> Course -> Module -> Lesson
-- one `print()` lesson
-- one backend-graded exercise
-- one backend-graded quiz
+- full Python for Beginners outline with modules, lessons, projects, and quizzes
+- early backend-graded exercises for runnable beginner lessons
 - one placement check
 - learner profile onboarding
 - course recommendation flow
@@ -49,7 +48,7 @@ Implemented:
 - backend auth endpoints for register, login, logout, and current user
 - frontend register/login screens for saving progress
 - progress, XP, streak, and badges
-- SQLite-backed learner profile, user, and progress persistence
+- SQLite-backed learner profile, user, progress, and curriculum persistence
 - user-selectable themes from backend-provided theme tokens
 - React/Vite frontend with staged onboarding and interactive lesson flow
 - backend tests for recommendation, placement, exercise grading, quiz grading,
@@ -57,7 +56,6 @@ Implemented:
 
 Not implemented yet:
 
-- full Python curriculum
 - admin/CMS content management
 - production-safe sandboxed Python runner
 - Monaco editor integration
@@ -191,7 +189,38 @@ Possible future Python paths:
 - Python for Games
 - Python for AI Builders
 
-The current Python for Beginners path is tiny seed content. It is not the full course.
+Python for Beginners is seeded as a full outline with placeholder lesson bodies,
+early runnable exercises, one quiz per module, mini projects, a final project,
+and a transition to Python for Intermediate Users as a coming-soon course.
+
+## Curriculum Content
+
+SQLite schema initialization runs automatically when the backend opens the
+database. The seed is idempotent and lives in:
+
+```text
+backend/app/db/seed_curriculum.py
+```
+
+To initialize or refresh seed content manually:
+
+```powershell
+python -c "from app.db.connection import get_connection; get_connection()" 
+```
+
+from the `backend` directory.
+
+To add content:
+
+- Add a course row in `seed_curriculum.py` and give it a stable slug.
+- Add modules to the `MODULES` list with `slug`, `title`, lessons, and projects.
+- Add a lesson by adding its title to a module; the seed creates slug, objective,
+  placeholder body, status, and ordering.
+- Add an exercise by adding an entry to `EXERCISES` keyed by lesson slug.
+- Add or customize module quiz questions in `_seed_quizzes`.
+
+The frontend renders the API-provided outline and should not hardcode course
+structure.
 
 ## Future Curricula
 

@@ -141,14 +141,14 @@ The core outcome is skill development.
 Do not build empty architecture only. Use tiny demo content to test the full
 journey.
 
-Current MVP seed flow:
+Current MVP seed content:
 
 ```text
 Python for Beginners
--> Python Basics module
--> print() lesson
--> one exercise
--> two-question quiz
+-> full module and lesson outline
+-> early runnable exercises
+-> one quiz per module
+-> mini projects and final project placeholder
 -> short placement check
 ```
 

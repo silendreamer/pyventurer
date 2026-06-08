@@ -59,6 +59,21 @@ class ProgressRepository:
     def get_progress(self, anonymous_user_id: str) -> ProgressState:
         return self._ensure_progress(anonymous_user_id)
 
+    def get_progress_for_user(self, user_id: str) -> ProgressState:
+        conn = get_connection()
+        row = conn.execute(
+            "SELECT anonymous_user_id FROM progress WHERE user_id = ? ORDER BY rowid DESC LIMIT 1",
+            (user_id,),
+        ).fetchone()
+        if row is not None:
+            return self._read_progress(row["anonymous_user_id"])
+        conn.execute(
+            "INSERT OR IGNORE INTO progress (anonymous_user_id, user_id) VALUES (?, ?)",
+            (user_id, user_id),
+        )
+        conn.commit()
+        return self._read_progress(user_id)
+
     def record_placement(self, anonymous_user_id: str, assessment_id: str, score: int) -> ProgressState:
         progress = self._ensure_progress(anonymous_user_id)
         scores = progress.placement_scores

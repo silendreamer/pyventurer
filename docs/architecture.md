@@ -31,14 +31,14 @@ Implemented now:
 - frontend register/login screens after value is shown
 - backend-owned recommendation, placement, quiz, exercise, progress, and badge
   logic
-- SQLite-backed profile, progress, and user repositories
-- in-memory seed content and theme repositories
+- SQLite-backed profile, progress, user, and curriculum repositories
+- in-memory theme repository
 - backend tests for important business rules
 
 Not implemented yet:
 
 - migrations
-- full Python curriculum
+- full authored Python lesson content
 - projects workflow
 - real CMS/admin tooling
 - AI tutor
@@ -90,7 +90,7 @@ Service Layer
   Account Service placeholder
 
 Repository Layer
-  In-memory content repository
+  SQLite-backed content repository
   SQLite-backed progress/profile repository
   SQLite-backed user repository
   In-memory theme repository
@@ -117,9 +117,10 @@ This means:
 - recommendations are rule-driven or data-driven
 - frontend components render data, not hardcoded curriculum
 
-The current MVP uses tiny in-memory seed content to prove the full flow.
-Profile, progress, badges, and users are persisted in SQLite. Future development
-should move learning content into persistent storage or CMS-managed records.
+The current MVP now stores curriculum content in SQLite through an idempotent
+schema initialization and seed process. The frontend consumes API-provided
+content and does not know whether records came from seed data, an admin tool, or
+a future CMS.
 
 ## Current Backend Structure
 
@@ -210,9 +211,15 @@ Future examples:
 
 Instructional content for a topic.
 
-Current seed:
+Current seeded course:
 
-- What is `print()`?
+- Python for Beginners
+- 15 modules
+- 77 lessons with placeholder bodies
+- early runnable exercises
+- one quiz per module
+- mini projects and a final project
+- Python for Intermediate Users as a coming-soon next course
 
 ### Exercise
 
@@ -369,8 +376,8 @@ recommendation, placement, grading, progress, and badges.
 Backend auth is implemented with registration, login, logout, current-user
 lookup, password hashing, signed JWT session tokens, and progress merge support.
 
-The frontend still needs full register/login screens. It currently shows a
-placeholder save-progress prompt after the learner has tried the sample content.
+The frontend includes register/login screens after the learner has tried sample
+content.
 
 ### Tutor Engine
 
@@ -406,15 +413,41 @@ Current seed content:
 ```text
 Language: Python
 Course: Python for Beginners
-Module: Python Basics
-Lesson: What is print()?
-Exercise: Print Hello World
-Quiz: print() Basics Check
+Modules: Welcome to Python through Beginner Projects
+Lessons: 77 placeholder lessons
+Exercises: early runnable beginner exercises
+Quizzes: one lightweight quiz per module
 Placement: Python Starting Point Check
 Themes: Explorer, Builder, Minimal
 ```
 
-This is not the real course. It only proves the framework works end to end.
+Lesson bodies are intentionally short placeholders. The structure proves the
+database-backed framework before full instructional writing begins.
+
+## Curriculum Schema And Seed
+
+Curriculum tables live in `backend/app/db/schema.sql`:
+
+- `languages`
+- `courses`
+- `course_prerequisites`
+- `modules`
+- `lessons`
+- `exercises`
+- `quizzes`
+- `quiz_questions`
+- `quiz_answer_choices`
+- `projects`
+- `course_completion_rules`
+
+The idempotent seed lives in `backend/app/db/seed_curriculum.py` and runs from
+`get_connection()`. Running backend startup or tests initializes the schema and
+seed data. Re-running the seed updates rows by stable IDs instead of duplicating
+records.
+
+To add a new module, add an entry to `MODULES`. To add a runnable exercise, add
+an `EXERCISES` entry keyed by the target lesson slug. To customize a quiz, update
+`_seed_quizzes` while keeping correct answers server-side only.
 
 ## Long-Term Vision
 

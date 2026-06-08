@@ -36,5 +36,14 @@ class ContentService:
     def get_curriculum_tree(self) -> dict:
         return self.repository.get_curriculum_tree()
 
+    def get_course_outline(self, course_slug: str) -> dict:
+        return self.repository.get_course_outline(course_slug)
+
+    def get_project(self, project_slug: str) -> dict:
+        return self.repository.get_project(project_slug)
+
+    def get_course_completion(self, course_slug: str) -> dict:
+        return self.repository.get_course_completion_rules(course_slug)
+
 
 content_service = ContentService(content_repository)
