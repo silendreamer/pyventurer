@@ -10,6 +10,11 @@ def get_catalog() -> dict:
     return content_service.get_catalog()
 
 
+@router.get("/curriculum")
+def get_curriculum() -> dict:
+    return content_service.get_curriculum_tree()
+
+
 @router.get("/courses/{course_slug}")
 def get_course(course_slug: str) -> dict:
     return content_service.get_course_overview(course_slug)

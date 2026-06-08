@@ -8,7 +8,7 @@ class AccountService:
     def create_placeholder_account(self, anonymous_user_id: str, email: str, name: str) -> dict:
         return {
             "status": "created",
-            "message": "MVP placeholder account created. Progress is ready to save when auth is implemented.",
+            "message": "Starter account created. Use register/login for persistent saved progress.",
             "user": {"id": anonymous_user_id, "email": email, "name": name},
             "progress": self.progress.get_progress(anonymous_user_id),
         }

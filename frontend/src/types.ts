@@ -37,6 +37,35 @@ export type Course = {
   outcomes: string[];
 };
 
+export type CurriculumLesson = {
+  id: string;
+  title: string;
+  topic: string;
+  implemented: boolean;
+};
+
+export type CurriculumModule = {
+  id: string;
+  title: string;
+  description: string;
+  lessons: CurriculumLesson[];
+};
+
+export type CurriculumCourse = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  modules: CurriculumModule[];
+};
+
+export type CurriculumLanguage = {
+  id: string;
+  title: string;
+  description: string;
+  courses: CurriculumCourse[];
+};
+
 export type Recommendation = {
   course: Course;
   starting_lesson_id: string;

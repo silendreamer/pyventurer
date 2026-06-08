@@ -144,7 +144,8 @@ journey.
 Current MVP seed flow:
 
 ```text
-Python Demo Path
+Python for Beginners
+-> Python Basics module
 -> print() lesson
 -> one exercise
 -> two-question quiz

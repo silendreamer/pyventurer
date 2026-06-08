@@ -37,7 +37,8 @@ Implemented:
 
 - FastAPI backend with thin API routes
 - service and repository layers
-- in-memory seed data for the Python Demo Path
+- in-memory seed data for Python for Beginners
+- backend-fed curriculum tree with Language -> Course -> Module -> Lesson
 - one `print()` lesson
 - one backend-graded exercise
 - one backend-graded quiz
@@ -46,7 +47,7 @@ Implemented:
 - course recommendation flow
 - anonymous try-before-register experience
 - backend auth endpoints for register, login, logout, and current user
-- frontend placeholder account creation prompt
+- frontend register/login screens for saving progress
 - progress, XP, streak, and badges
 - SQLite-backed learner profile, user, and progress persistence
 - user-selectable themes from backend-provided theme tokens
@@ -56,7 +57,6 @@ Implemented:
 
 Not implemented yet:
 
-- frontend register/login screens
 - full Python curriculum
 - admin/CMS content management
 - production-safe sandboxed Python runner
@@ -191,7 +191,7 @@ Possible future Python paths:
 - Python for Games
 - Python for AI Builders
 
-The current Python Demo Path is tiny seed content. It is not the full course.
+The current Python for Beginners path is tiny seed content. It is not the full course.
 
 ## Future Curricula
 

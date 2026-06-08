@@ -53,9 +53,9 @@ class ContentRepository:
             Course(
                 id="python-demo",
                 language_id="python",
-                title="Python Demo Path",
+                title="Python for Beginners",
                 slug="python-demo-path",
-                description="A tiny end-to-end path that proves the PyVenturer framework works.",
+                description="A tiny beginner path that proves the PyVenturer framework works end-to-end.",
                 target_audience="New Python learners",
                 difficulty="Beginner",
                 estimated_duration="20 minutes",
@@ -152,6 +152,135 @@ class ContentRepository:
                 ],
             )
         ]
+        self.curriculum_tree = {
+            "languages": [
+                {
+                    "id": "python",
+                    "title": "Python",
+                    "description": "Learn Python from beginner fundamentals to applied tracks.",
+                    "courses": [
+                        {
+                            "id": "python-demo",
+                            "title": "Python for Beginners",
+                            "slug": "python-demo-path",
+                            "description": "Start with practical Python fundamentals.",
+                            "modules": [
+                                {
+                                    "id": "python-basics",
+                                    "title": "Python Basics",
+                                    "description": "First concepts every Python learner needs.",
+                                    "lessons": [
+                                        {
+                                            "id": "lesson-print",
+                                            "title": "Print output",
+                                            "topic": "print()",
+                                            "implemented": True,
+                                        },
+                                        {
+                                            "id": "lesson-variables",
+                                            "title": "Variables",
+                                            "topic": "variables",
+                                            "implemented": False,
+                                        },
+                                        {
+                                            "id": "lesson-strings",
+                                            "title": "Strings",
+                                            "topic": "strings",
+                                            "implemented": False,
+                                        },
+                                    ],
+                                },
+                                {
+                                    "id": "control-flow",
+                                    "title": "Control Flow",
+                                    "description": "Make programs branch and repeat.",
+                                    "lessons": [
+                                        {
+                                            "id": "lesson-conditionals",
+                                            "title": "Conditionals",
+                                            "topic": "if statements",
+                                            "implemented": False,
+                                        },
+                                        {
+                                            "id": "lesson-loops",
+                                            "title": "Loops",
+                                            "topic": "for and while loops",
+                                            "implemented": False,
+                                        },
+                                        {
+                                            "id": "lesson-functions",
+                                            "title": "Functions",
+                                            "topic": "functions",
+                                            "implemented": False,
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            "id": "python-advanced",
+                            "title": "Python Advanced",
+                            "slug": "python-advanced",
+                            "description": "Future path for deeper Python skills.",
+                            "modules": [
+                                {
+                                    "id": "advanced-structures",
+                                    "title": "Data Structures",
+                                    "description": "Lists, dictionaries, files, and modules.",
+                                    "lessons": [
+                                        {
+                                            "id": "lesson-lists",
+                                            "title": "Lists",
+                                            "topic": "lists",
+                                            "implemented": False,
+                                        },
+                                        {
+                                            "id": "lesson-dictionaries",
+                                            "title": "Dictionaries",
+                                            "topic": "dictionaries",
+                                            "implemented": False,
+                                        },
+                                        {
+                                            "id": "lesson-files",
+                                            "title": "Files",
+                                            "topic": "files",
+                                            "implemented": False,
+                                        },
+                                    ],
+                                }
+                            ],
+                        },
+                        {
+                            "id": "python-data-science",
+                            "title": "Python for Data Science",
+                            "slug": "python-data-science",
+                            "description": "Future path for analysis and visualization.",
+                            "modules": [
+                                {
+                                    "id": "data-foundations",
+                                    "title": "Data Foundations",
+                                    "description": "Prepare for real data work.",
+                                    "lessons": [
+                                        {
+                                            "id": "lesson-data-lists",
+                                            "title": "Working with datasets",
+                                            "topic": "datasets",
+                                            "implemented": False,
+                                        },
+                                        {
+                                            "id": "lesson-pandas-intro",
+                                            "title": "Intro to pandas",
+                                            "topic": "pandas",
+                                            "implemented": False,
+                                        },
+                                    ],
+                                }
+                            ],
+                        },
+                    ],
+                }
+            ]
+        }
 
     def list_languages(self) -> list[Language]:
         return self.languages
@@ -176,6 +305,9 @@ class ContentRepository:
 
     def get_placement_for_course(self, course_id: str) -> PlacementAssessment:
         return next((a for a in self.placement_assessments if a.course_id == course_id), None) or _not_found("Placement", course_id)
+
+    def get_curriculum_tree(self) -> dict:
+        return self.curriculum_tree
 
 
 content_repository = ContentRepository()

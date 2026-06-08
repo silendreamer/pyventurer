@@ -7,6 +7,7 @@ import {
   Flame,
   GraduationCap,
   Lightbulb,
+  Lock,
   Palette,
   Play,
   Save,
@@ -16,7 +17,19 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { api } from "./api";
-import type { Exercise, LearnerProfile, Lesson, Progress, Question, Quiz, Recommendation, Theme } from "./types";
+import type {
+  CurriculumCourse,
+  CurriculumLanguage,
+  CurriculumModule,
+  Exercise,
+  LearnerProfile,
+  Lesson,
+  Progress,
+  Question,
+  Quiz,
+  Recommendation,
+  Theme,
+} from "./types";
 
 const anonymousUserId = "demo-user";
 
@@ -62,6 +75,7 @@ type Placement = {
 function App() {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [curriculum, setCurriculum] = useState<CurriculumLanguage[]>([]);
   const [step, setStep] = useState("start");
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -88,12 +102,13 @@ function App() {
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null);
 
   useEffect(() => {
-    Promise.all([api.themes(), api.progress(anonymousUserId)])
-      .then(([themeData, progressData]) => {
+    Promise.all([api.themes(), api.progress(anonymousUserId), api.curriculum()])
+      .then(([themeData, progressData, curriculumData]) => {
         const typedThemes = (themeData as { themes: Theme[] }).themes;
         setThemes(typedThemes);
         setTheme(typedThemes[0] ?? defaultTheme);
         setProgress(progressData as Progress);
+        setCurriculum((curriculumData as { languages: CurriculumLanguage[] }).languages);
         setApiMessage("");
       })
       .catch(() => {
@@ -149,6 +164,28 @@ function App() {
     setCode(course.exercise.starter_code);
     setPlacement(placementData as Placement);
     setStep("placement");
+  }
+
+  async function loadDemoCourse(targetStep = "placement") {
+    const [courseData, placementData] = await Promise.all([
+      api.course("python-demo-path"),
+      api.placement("python-demo"),
+    ]);
+    const course = courseData as { lesson: Lesson; exercise: Exercise; quiz: { id: string } };
+    setLesson(course.lesson);
+    setExercise(course.exercise);
+    setCode(course.exercise.starter_code);
+    setPlacement(placementData as Placement);
+    setStep(targetStep);
+  }
+
+  async function openCurriculumLesson(courseSlug: string, lessonId: string) {
+    if (courseSlug !== "python-demo-path" || lessonId !== "lesson-print") return;
+    if (!lesson || !exercise) {
+      await loadDemoCourse("lesson");
+      return;
+    }
+    setStep("lesson");
   }
 
   async function submitPlacement() {
@@ -280,7 +317,7 @@ function App() {
       ) : (
         <section className="learning-strip">
           <div>
-            <strong>{recommendations[0]?.course.title ?? "Python Demo Path"}</strong>
+            <strong>{recommendations[0]?.course.title ?? "Python for Beginners"}</strong>
             <span>{step === "lesson" ? "Sample lesson and coding exercise" : "Guided learner path"}</span>
           </div>
           <ThemeSelector themes={themes} selectedTheme={theme} onSelect={chooseTheme} compact />
@@ -288,6 +325,12 @@ function App() {
       )}
 
       <section className="workspace">
+        <CurriculumSidebar
+          languages={curriculum}
+          progress={progress}
+          currentLessonId={lesson?.id}
+          onOpenLesson={openCurriculumLesson}
+        />
         <section className="main-panel">
           {apiMessage && <div className="result">{apiMessage}</div>}
           {step === "start" && (
@@ -347,6 +390,177 @@ function App() {
         </section>
       </section>
     </main>
+  );
+}
+
+function CurriculumSidebar({
+  languages,
+  progress,
+  currentLessonId,
+  onOpenLesson,
+}: {
+  languages: CurriculumLanguage[];
+  progress: Progress;
+  currentLessonId?: string;
+  onOpenLesson: (courseSlug: string, lessonId: string) => void;
+}) {
+  const [openCourses, setOpenCourses] = useState<Record<string, boolean>>({ "python-demo": true });
+  const [openModules, setOpenModules] = useState<Record<string, boolean>>({ "python-basics": true });
+  const completedLessons = new Set(progress.completed_lessons);
+  const totalLessons = languages.flatMap((language) =>
+    language.courses.flatMap((course) => course.modules.flatMap((module) => module.lessons))
+  ).length;
+
+  function toggleCourse(courseId: string) {
+    setOpenCourses((current) => ({ ...current, [courseId]: !current[courseId] }));
+  }
+
+  function toggleModule(moduleId: string) {
+    setOpenModules((current) => ({ ...current, [moduleId]: !current[moduleId] }));
+  }
+
+  return (
+    <aside className="path-sidebar" aria-label="Curriculum browser">
+      <div className="path-sidebar-header">
+        <span>Curriculum</span>
+        <strong>{completedLessons.size}/{totalLessons}</strong>
+      </div>
+      <div className="curriculum-tree">
+        {(languages.length ? languages : []).map((language) => (
+          <section className="tree-language" key={language.id}>
+            <div className="tree-language-title">
+              <BookOpen size={17} />
+              <strong>{language.title}</strong>
+            </div>
+            <div className="tree-children">
+              {language.courses.map((course) => (
+                <CurriculumCourseNode
+                  key={course.id}
+                  course={course}
+                  open={Boolean(openCourses[course.id])}
+                  openModules={openModules}
+                  completedLessons={completedLessons}
+                  currentLessonId={currentLessonId}
+                  onToggleCourse={toggleCourse}
+                  onToggleModule={toggleModule}
+                  onOpenLesson={onOpenLesson}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+function CurriculumCourseNode({
+  course,
+  open,
+  openModules,
+  completedLessons,
+  currentLessonId,
+  onToggleCourse,
+  onToggleModule,
+  onOpenLesson,
+}: {
+  course: CurriculumCourse;
+  open: boolean;
+  openModules: Record<string, boolean>;
+  completedLessons: Set<string>;
+  currentLessonId?: string;
+  onToggleCourse: (courseId: string) => void;
+  onToggleModule: (moduleId: string) => void;
+  onOpenLesson: (courseSlug: string, lessonId: string) => void;
+}) {
+  return (
+    <div className="tree-course">
+      <button className="course-toggle" onClick={() => onToggleCourse(course.id)} aria-expanded={open}>
+        <ChevronRight className={open ? "chevron open" : "chevron"} size={16} />
+        <span>
+          <strong>{course.title}</strong>
+          <small>{course.description}</small>
+        </span>
+      </button>
+      {open && (
+        <div className="tree-children">
+          {course.modules.map((module) => (
+            <CurriculumModuleNode
+              key={module.id}
+              module={module}
+              courseSlug={course.slug}
+              open={Boolean(openModules[module.id])}
+              completedLessons={completedLessons}
+              currentLessonId={currentLessonId}
+              onToggleModule={onToggleModule}
+              onOpenLesson={onOpenLesson}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CurriculumModuleNode({
+  module,
+  courseSlug,
+  open,
+  completedLessons,
+  currentLessonId,
+  onToggleModule,
+  onOpenLesson,
+}: {
+  module: CurriculumModule;
+  courseSlug: string;
+  open: boolean;
+  completedLessons: Set<string>;
+  currentLessonId?: string;
+  onToggleModule: (moduleId: string) => void;
+  onOpenLesson: (courseSlug: string, lessonId: string) => void;
+}) {
+  return (
+    <div className="tree-module">
+      <button className="module-toggle" onClick={() => onToggleModule(module.id)} aria-expanded={open}>
+        <ChevronRight className={open ? "chevron open" : "chevron"} size={15} />
+        <span>
+          <strong>{module.title}</strong>
+          <small>{module.description}</small>
+        </span>
+      </button>
+      {open && (
+        <ol className="lesson-list">
+          {module.lessons.map((item) => {
+            const completed = completedLessons.has(item.id);
+            const current = currentLessonId === item.id;
+            const available = item.implemented;
+            const locked = !completed && !available;
+            return (
+              <li key={item.id}>
+                <button
+                  className={[
+                    "lesson-link",
+                    completed ? "complete" : "",
+                    current ? "current" : "",
+                    locked ? "locked" : "",
+                  ].join(" ")}
+                  disabled={locked}
+                  onClick={() => onOpenLesson(courseSlug, item.id)}
+                >
+                  <span className="lesson-state" aria-hidden="true">
+                    {completed ? <CheckCircle2 size={15} /> : locked ? <Lock size={13} /> : <Play size={13} />}
+                  </span>
+                  <span>
+                    <strong>{item.title}</strong>
+                    <small>{completed ? "Completed" : available ? "Available" : "Locked"}</small>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </div>
   );
 }
 

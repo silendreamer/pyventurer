@@ -227,7 +227,9 @@ Current MVP UI state:
 
 The app uses a compact Python value intro, staged onboarding questions, XP and
 badge summary in the top bar, a compact learning context strip after onboarding,
-and a wide lesson/exercise workspace.
+a backend-fed curriculum sidebar for Language -> Course -> Module -> Lesson,
+completed and available lessons as links, future lessons as locked items, and a
+wide lesson/exercise workspace.
 
 Gamification
 

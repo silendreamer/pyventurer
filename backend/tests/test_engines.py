@@ -1,4 +1,5 @@
 from app.models.domain import LearnerProfile
+from app.services.content_service import content_service
 from app.services.exercise_service import exercise_service
 from app.services.placement_service import placement_service
 from app.services.quiz_service import quiz_service
@@ -20,6 +21,20 @@ def test_recommendation_uses_profile_goal():
 
     assert recommendations[0].course.id == "python-demo"
     assert recommendations[0].starting_lesson_id == "lesson-print"
+
+
+def test_curriculum_tree_exposes_course_module_lesson_hierarchy():
+    curriculum = content_service.get_curriculum_tree()
+    python = curriculum["languages"][0]
+    beginner_course = python["courses"][0]
+    first_module = beginner_course["modules"][0]
+
+    assert python["title"] == "Python"
+    assert beginner_course["title"] == "Python for Beginners"
+    assert first_module["title"] == "Python Basics"
+    assert first_module["lessons"][0]["id"] == "lesson-print"
+    assert first_module["lessons"][0]["implemented"] is True
+    assert first_module["lessons"][1]["implemented"] is False
 
 
 def test_placement_scores_on_backend():

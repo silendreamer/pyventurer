@@ -23,8 +23,9 @@ export const api = {
     request("/themes/select", {
       method: "POST",
       body: JSON.stringify({ anonymous_user_id: anonymousUserId, theme_id: themeId }),
-    }),
+  }),
   catalog: () => request("/catalog"),
+  curriculum: () => request("/curriculum"),
   saveProfile: (anonymousUserId: string, profile: LearnerProfile) =>
     request("/onboarding/profile", {
       method: "POST",

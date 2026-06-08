@@ -23,5 +23,8 @@ class ContentService:
             "quiz": {"id": quiz.id, "title": quiz.title, "passing_score": quiz.passing_score},
         }
 
+    def get_curriculum_tree(self) -> dict:
+        return self.repository.get_curriculum_tree()
+
 
 content_service = ContentService(content_repository)

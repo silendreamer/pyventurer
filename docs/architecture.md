@@ -28,7 +28,7 @@ Implemented now:
 - XP, streak, and badges
 - user-selectable themes
 - backend auth endpoints for register, login, logout, and current user
-- frontend placeholder account prompt after value is shown
+- frontend register/login screens after value is shown
 - backend-owned recommendation, placement, quiz, exercise, progress, and badge
   logic
 - SQLite-backed profile, progress, and user repositories
@@ -38,7 +38,6 @@ Implemented now:
 Not implemented yet:
 
 - migrations
-- frontend register/login screens
 - full Python curriculum
 - projects workflow
 - real CMS/admin tooling
@@ -198,7 +197,7 @@ A learning path within a language or subject.
 
 Current seed:
 
-- Python Demo Path
+- Python for Beginners
 
 Future examples:
 
@@ -329,7 +328,7 @@ The current implementation uses `ContentService` and `ContentRepository`.
 
 Recommends courses and next steps based on learner profile fields.
 
-The current implementation recommends the Python Demo Path.
+The current implementation recommends Python for Beginners.
 
 ### Placement Engine
 
@@ -393,6 +392,10 @@ Current UI behavior:
 - XP, streak, and badge count live in the top bar.
 - Landing includes a compact Python value intro.
 - Onboarding asks one question at a time.
+- A curriculum sidebar shows Language -> Course -> Module -> Lesson structure
+  from backend seed data.
+- Completed and available implemented lessons can be opened; future lessons are
+  shown locked until content and unlock rules exist.
 - Learning pages use a compact context strip instead of a large hero.
 - Theme can be selected without changing curriculum or grading.
 
@@ -402,7 +405,8 @@ Current seed content:
 
 ```text
 Language: Python
-Course: Python Demo Path
+Course: Python for Beginners
+Module: Python Basics
 Lesson: What is print()?
 Exercise: Print Hello World
 Quiz: print() Basics Check
