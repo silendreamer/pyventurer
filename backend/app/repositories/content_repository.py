@@ -306,6 +306,15 @@ class ContentRepository:
     def get_placement_for_course(self, course_id: str) -> PlacementAssessment:
         return next((a for a in self.placement_assessments if a.course_id == course_id), None) or _not_found("Placement", course_id)
 
+    def get_first_lesson_for_course(self, course_id: str) -> Lesson:
+        return next((l for l in self.lessons if l.course_id == course_id), None) or _not_found("Lesson for course", course_id)
+
+    def get_first_exercise_for_lesson(self, lesson_id: str) -> Exercise:
+        return next((e for e in self.exercises if e.lesson_id == lesson_id), None) or _not_found("Exercise for lesson", lesson_id)
+
+    def get_first_quiz_for_lesson(self, lesson_id: str) -> Quiz:
+        return next((q for q in self.quizzes if q.lesson_id == lesson_id), None) or _not_found("Quiz for lesson", lesson_id)
+
     def get_curriculum_tree(self) -> dict:
         return self.curriculum_tree
 

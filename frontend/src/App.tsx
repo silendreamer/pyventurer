@@ -913,6 +913,7 @@ function AuthPanel({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const isError = message.toLowerCase().includes("failed") || message.toLowerCase().includes("invalid");
 
   if (user) {
     return (
@@ -943,6 +944,7 @@ function AuthPanel({
           <input
             type="text"
             placeholder="Name"
+            autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -950,12 +952,14 @@ function AuthPanel({
         <input
           type="email"
           placeholder="Email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
           placeholder="Password (6+ characters)"
+          autoComplete={mode === "register" ? "new-password" : "current-password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -972,7 +976,7 @@ function AuthPanel({
       >
         {mode === "register" ? "Already have an account? Log in" : "Need an account? Register"}
       </button>
-      {message && <div className="result success">{message}</div>}
+      {message && <div className={isError ? "result" : "result success"}>{message}</div>}
     </div>
   );
 }

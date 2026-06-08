@@ -13,9 +13,9 @@ class ContentService:
 
     def get_course_overview(self, slug: str) -> dict:
         course = self.repository.get_course_by_slug(slug)
-        lesson = next(lesson for lesson in self.repository.lessons if lesson.course_id == course.id)
-        exercise = next(exercise for exercise in self.repository.exercises if exercise.lesson_id == lesson.id)
-        quiz = next(quiz for quiz in self.repository.quizzes if quiz.lesson_id == lesson.id)
+        lesson = self.repository.get_first_lesson_for_course(course.id)
+        exercise = self.repository.get_first_exercise_for_lesson(lesson.id)
+        quiz = self.repository.get_first_quiz_for_lesson(lesson.id)
         return {
             "course": course,
             "lesson": lesson,
