@@ -2,6 +2,8 @@ import os
 import sqlite3
 from pathlib import Path
 
+from app.db.seed_curriculum import seed_curriculum
+
 _connection: sqlite3.Connection | None = None
 
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
@@ -15,6 +17,7 @@ def get_connection() -> sqlite3.Connection:
         _connection.row_factory = sqlite3.Row
         _connection.execute("PRAGMA journal_mode=WAL")
         _connection.executescript(SCHEMA_PATH.read_text())
+        seed_curriculum(_connection)
     return _connection
 
 

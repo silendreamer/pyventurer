@@ -21,6 +21,9 @@ class Course(BaseModel):
     difficulty: str
     estimated_duration: str
     outcomes: list[str]
+    status: str = "published"
+    course_goal: str = ""
+    next_course_slug: str | None = None
     is_active: bool = True
 
 
@@ -32,6 +35,11 @@ class Lesson(BaseModel):
     body: str
     code_examples: list[str]
     estimated_minutes: int
+    slug: str = ""
+    short_description: str = ""
+    learning_objective: str = ""
+    status: str = "preview"
+    order_index: int = 0
 
 
 class Exercise(BaseModel):
@@ -43,6 +51,9 @@ class Exercise(BaseModel):
     language_id: str
     grader_type: Literal["output_match", "code_contains", "code_not_contains", "unit_test"]
     grader_config: dict[str, str]
+    slug: str = ""
+    status: str = "preview"
+    order_index: int = 0
 
 
 class QuizQuestion(BaseModel):
@@ -62,6 +73,9 @@ class Quiz(BaseModel):
     title: str
     passing_score: int
     questions: list[QuizQuestionWithAnswer]
+    slug: str = ""
+    module_id: str | None = None
+    status: str = "published"
 
 
 class PlacementQuestion(BaseModel):

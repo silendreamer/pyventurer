@@ -17,7 +17,7 @@ class RecommendationService:
                 reason=reason,
                 next_steps=[
                     "Take the short Python placement check",
-                    "Try the print() sample lesson",
+                    "Try the first runnable Python exercise",
                     "Create an account only when you are ready to save progress",
                 ],
             )
@@ -30,7 +30,7 @@ class RecommendationService:
             return "Python is a strong first step for scripts and automation tools."
         if profile.learning_goal == "ai":
             return "Python basics are the foundation for later AI builder paths."
-        return "This tiny path proves the platform flow before larger courses are added."
+        return "This beginner path starts with practical Python and small runnable programs."
 
 
 recommendation_service = RecommendationService(content_repository)

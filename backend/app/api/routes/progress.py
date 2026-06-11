@@ -1,8 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.auth import get_current_user
 from app.services.progress_service import progress_service
 
 router = APIRouter()
+
+
+@router.get("/progress/me")
+def get_my_progress(user: dict = Depends(get_current_user)):
+    return progress_service.get_progress_for_user(user["id"])
 
 
 @router.get("/progress/{anonymous_user_id}")

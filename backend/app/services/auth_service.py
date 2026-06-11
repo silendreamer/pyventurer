@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from app.db.connection import get_connection
 from app.repositories.user_repository import UserRepository, user_repository
 
-SECRET_KEY = os.environ.get("PYVENTURER_SECRET_KEY", "dev-secret-change-in-production")
+SECRET_KEY = os.environ.get("PYVENTURER_SECRET_KEY", "dev-secret-change-in-production!!")
 TOKEN_EXPIRY_DAYS = 7
 
 

@@ -23,14 +23,17 @@ export const api = {
     request("/themes/select", {
       method: "POST",
       body: JSON.stringify({ anonymous_user_id: anonymousUserId, theme_id: themeId }),
-    }),
+  }),
   catalog: () => request("/catalog"),
+  curriculum: () => request("/curriculum"),
+  courseOutline: (slug: string) => request(`/courses/${slug}/outline`),
   saveProfile: (anonymousUserId: string, profile: LearnerProfile) =>
     request("/onboarding/profile", {
       method: "POST",
       body: JSON.stringify({ anonymous_user_id: anonymousUserId, profile }),
     }),
   course: (slug: string) => request(`/courses/${slug}`),
+  lessonBundle: (lessonIdOrSlug: string) => request(`/lessons/${lessonIdOrSlug}`),
   placement: (courseId: string) => request(`/courses/${courseId}/placement`),
   submitPlacement: (anonymousUserId: string, courseId: string, answers: Record<string, string>) =>
     request(`/courses/${courseId}/placement`, {
@@ -52,6 +55,7 @@ export const api = {
   completeLesson: (anonymousUserId: string, lessonId: string) =>
     request(`/progress/${anonymousUserId}/lessons/${lessonId}/complete`, { method: "POST" }),
   progress: (anonymousUserId: string) => request(`/progress/${anonymousUserId}`),
+  myProgress: () => request("/progress/me"),
   createAccount: (anonymousUserId: string, name: string, email: string) =>
     request("/account", {
       method: "POST",

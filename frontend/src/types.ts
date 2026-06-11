@@ -35,6 +35,65 @@ export type Course = {
   difficulty: string;
   estimated_duration: string;
   outcomes: string[];
+  status: string;
+  next_course_slug?: string | null;
+};
+
+export type CurriculumLesson = {
+  id: string;
+  title: string;
+  slug: string;
+  topic: string;
+  description: string;
+  status: string;
+  order_index: number;
+  implemented: boolean;
+};
+
+export type CurriculumProject = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  type: string;
+  status: string;
+  order_index: number;
+};
+
+export type CurriculumQuizSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+};
+
+export type CurriculumModule = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  status: string;
+  order_index: number;
+  lessons: CurriculumLesson[];
+  projects: CurriculumProject[];
+  quiz?: CurriculumQuizSummary | null;
+};
+
+export type CurriculumCourse = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  status: string;
+  next_course_slug?: string | null;
+  modules: CurriculumModule[];
+};
+
+export type CurriculumLanguage = {
+  id: string;
+  title: string;
+  description: string;
+  courses: CurriculumCourse[];
 };
 
 export type Recommendation = {
