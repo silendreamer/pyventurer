@@ -61,7 +61,9 @@ npm.cmd run build
 ## Vercel Deployment
 
 The root `vercel.json` builds `frontend/` as a Vite app and serves the FastAPI
-backend through `api/index.py` as a Python function.
+backend through `api/index.py` as a Python function. The root `.python-version`
+pins Vercel to Python 3.12 so native dependencies are built against a supported
+runtime.
 
 Recommended Vercel environment variable:
 
