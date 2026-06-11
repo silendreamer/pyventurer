@@ -61,7 +61,10 @@ npm.cmd run build
 ## Vercel Deployment
 
 The root `vercel.json` builds `frontend/` as a Vite app and serves the FastAPI
-backend through `api/index.py` as a Python function.
+backend through `api/index.py` as a Python function. The root `.python-version`
+and `pyproject.toml` Python constraint steer Vercel away from Python 3.14, and
+the Pydantic pin is kept current enough to avoid old `pydantic-core` PyO3 build
+failures if Vercel still selects a newer runtime.
 
 Recommended Vercel environment variable:
 
