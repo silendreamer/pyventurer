@@ -61,7 +61,7 @@ Not implemented yet:
 - Monaco editor integration
 - AI tutor
 - projects workflow
-- deployment
+- durable production database
 
 ## Core Product Idea
 
@@ -255,6 +255,13 @@ React TypeScript Vite custom CSS
 Backend:
 
 FastAPI Python SQLite Repository and service pattern
+
+Deployment:
+
+Vercel can build the Vite frontend and serve the FastAPI backend from the root
+`api/index.py` function. Set `PYVENTURER_SECRET_KEY` in Vercel before using auth
+outside local demos. The Vercel SQLite path defaults to `/tmp/pyventurer.db`,
+which is useful for demo deployments but not durable production persistence.
 
 Future stack direction:
 

@@ -24,11 +24,12 @@ http://127.0.0.1:5174
 The frontend defaults to:
 
 ```text
-http://127.0.0.1:8001/api
+/api
 ```
 
-If port `5174` is busy, any Vite port can be used. The backend CORS settings
-allow local `localhost` and `127.0.0.1` development ports.
+Vite proxies `/api` to `http://127.0.0.1:8001` during local development. If
+port `5174` is busy, any Vite port can be used. The backend CORS settings allow
+local `localhost` and `127.0.0.1` development ports.
 
 ## Verify
 
@@ -56,3 +57,18 @@ npm.cmd run build
   register/login screens.
 - The Python runner is intentionally limited and suitable only for demo
   exercises. It is not a production sandbox.
+
+## Vercel Deployment
+
+The root `vercel.json` builds `frontend/` as a Vite app and serves the FastAPI
+backend through `api/index.py` as a Python function.
+
+Recommended Vercel environment variable:
+
+```text
+PYVENTURER_SECRET_KEY=<strong random secret>
+```
+
+The MVP SQLite database is stored at `/tmp/pyventurer.db` on Vercel. That keeps
+the demo deployable, but `/tmp` is ephemeral serverless storage. Move persistence
+to a hosted database before relying on saved accounts or progress in production.
