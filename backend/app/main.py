@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -15,8 +16,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="PyVenturer API", version="0.1.0", lifespan=lifespan)
 
+allowed_origins = [
+    origin.strip()
+    for origin in os.environ.get("PYVENTURER_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=allowed_origins,
     allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
     allow_credentials=True,
     allow_methods=["*"],
